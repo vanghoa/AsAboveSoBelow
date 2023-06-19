@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+        <style>
+            @font-face {
+                font-family: 'asabovesobelow';
+                src: url('AsAbove,SoBelow(Beta22)VF_.ttf');
+            }
+
+            @font-feature-values "asabovesobelow" {
+                @styleset {
+                    alt: 1;
+                }
+            }
+
+            * {
+                font-family: asabovesobelow;
+                font-size: 20px;
+                line-height: 3.64em;
+                overflow: hidden;
+                margin: 0;
+                padding: 0;
+                font-variation-settings: 'wght' 0;
+            }
+
+            span {
+                transition: font-variation-settings 2s;
+                font-variation-settings: 'wght' 0;
+            }
+
+            span.alt {
+                font-variation-settings: 'wght' 100;
+            }
+
+            span.altshort {
+                font-variation-settings: 'wght' 90;
+            }
+
+            p {
+                width: 100%;
+            }
+
+            p span:last-child {
+                visibility: hidden;
+            }
+
+            div * {
+                font-family: Arial, Helvetica, sans-serif;
+                font-size: 15px;
+                line-height: 1.5em;
+                display: block;
+            }
+        </style>
+        <script src="lodash.custom.min.js"></script>
+        <script src="index.js" defer></script>
+    </head>
+    <body>
+        <p style="visibility: hidden; position: absolute">
+            HOmOcuLUS B ORChId MANtIs THIS SCulptURaL STUDy oF the lIFefOrm
+            KnowN aS coLlOQUIaLLY AS THe ORCHId MANTIs ExhiBiTs sOMe cuRiOuS
+            HybRId ANd cHimERic BEhaVIoRS THAT refER boTh To PLanTS aND anImAls
+            NOT mUCh IS KNown of ITs AnAtomY or BEhavioR bUt THE desiGn Of tHIs
+            scuLptUre IMPLIeS thAT it seRvED As A KIND OF rELIGiOus objeCT as
+            well As A FOCuS fOr RItuaL actIViTY antHrOPOLOGIsTS hAvE surmiSEd
+            THAt IT MIgHt HaVE been uSED iN praCtICES rELatING to thERIaNtHROpy
+            or ShaPeShIfTING where IDEnTiTy gEnDeR sPecIes AnD genUS are fLuid
+            In tHE CoNtExt OF THE ritUAl sPACE wIthoUt OtheR ArtifacTS we Can
+            oNLY GUESs at thE nAtURe OF ThE SocieTY ThAt CReatEd thIS ObJeCT aNd
+            how thEiR PEOPle MIghT HAVE lIveD aRTiFacts FROM THE age Of COLLApSe
+        </p>
+        <p>
+            HOmOcuLUS B ORChId MANtIs THIS SCulptURaL STUDy oF the lIFefOrm
+            KnowN aS coLlOQUIaLLY AS THe ORCHId MANTIs ExhiBiTs sOMe cuRiOuS
+            HybRId ANd cHimERic BEhaVIoRS THAT refER boTh To PLanTS aND anImAls
+            NOT mUCh IS KNown of ITs AnAtomY or BEhavioR bUt THE desiGn Of tHIs
+            scuLptUre IMPLIeS thAT it seRvED As A KIND OF rELIGiOus objeCT as
+            well As A FOCuS fOr RItuaL actIViTY antHrOPOLOGIsTS hAvE surmiSEd
+            THAt IT MIgHt HaVE been uSED iN praCtICES rELatING to thERIaNtHROpy
+            or ShaPeShIfTING where IDEnTiTy gEnDeR sPecIes AnD genUS are fLuid
+            In tHE CoNtExt OF THE ritUAl sPACE wIthoUt OtheR ArtifacTS we Can
+            oNLY GUESs at thE nAtURe OF ThE SocieTY ThAt CReatEd thIS ObJeCT aNd
+            how thEiR PEOPle MIghT HAVE lIveD aRTiFacts FROM THE age Of COLLApSe
+        </p>
+        <div>
+            <textarea
+                id="textareabox"
+                name="textarea1"
+                placeholder="Start here..."
+            ></textarea>
+            <input type="button" value="Sample text" onclick="setText()" />
+        </div>
+    </body>
+</html>
