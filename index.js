@@ -346,7 +346,7 @@ function wait(delay) {
     return new Promise((resolve) => setTimeout(resolve, delay));
 }
 
-function setText() {
+async function setText() {
     let text = document
         .getElementById('textareabox')
         .value.replace(/[0-9]/g, '');
@@ -355,6 +355,7 @@ function setText() {
         document.getElementById('textareabox').value =
             text;
     pnode = px.firstChild;
+    await wait(200);
     extractLinesFromTextNode(pnode);
 }
 
