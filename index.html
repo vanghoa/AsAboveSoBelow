@@ -7,7 +7,7 @@
         <style>
             @font-face {
                 font-family: 'asabovesobelow';
-                src: url('AsAbove,SoBelow(Beta23)VF.ttf');
+                src: url('AsAbove,SoBelow(Beta40)VF.ttf');
             }
 
             @font-feature-values "asabovesobelow" {
@@ -16,7 +16,12 @@
                 }
             }
 
+            :root {
+                --unit: 0px;
+            }
+
             * {
+                box-sizing: border-box;
                 font-family: asabovesobelow;
                 font-size: 20px;
                 line-height: 3.64em;
@@ -24,11 +29,26 @@
                 padding: 0;
                 font-variation-settings: 'wght' 0;
                 color: white;
+                font-kerning: normal;
+            }
+
+            body,
+            textarea,
+            input {
+                background-color: black;
+                padding: 1rem;
+                margin-bottom: 2rem;
+            }
+
+            body {
+                overflow-y: scroll;
+                padding: 2rem;
             }
 
             span {
                 transition: font-variation-settings 0.5s;
                 font-variation-settings: 'wght' 0;
+                font-kerning: none;
             }
 
             span.alt {
@@ -47,59 +67,90 @@
                 visibility: hidden;
             }
 
-            div * {
+            #input {
+                width: 100%;
+            }
+
+            input {
+                background-color: rgb(33, 33, 33);
+            }
+
+            textarea {
+                width: 100%;
+                resize: vertical;
+                height: 10rem;
+            }
+
+            #input * {
                 font-family: Arial, Helvetica, sans-serif;
                 font-size: 15px;
                 line-height: 1.5em;
                 display: block;
             }
 
-            body,
-            textarea,
-            input {
-                background-color: black;
-            }
-            body {
-                overflow-y: scroll;
+            #viewer {
+                width: 100%;
+                max-width: 100%;
+                position: relative;
+                margin-top: -2rem;
+                resize: horizontal;
+                overflow: auto;
+                background: linear-gradient(
+                    135deg,
+                    black 0,
+                    black 98%,
+                    #fff 98.001%
+                );
             }
         </style>
         <script src="lodash.custom.min.js"></script>
+        <script src="opentype.js"></script>
         <script src="index.js" defer></script>
+        <!-- using global declaration -->
+        <script src="https://cdn.jsdelivr.net/npm/opentype.js"></script>
     </head>
     <body>
-        <p style="visibility: hidden; position: absolute">
-            HOmOcuLUS B ORChId MANtIs THIS SCulptURaL STUDy oF the lIFefOrm
-            KnowN aS coLlOQUIaLLY AS THe ORCHId MANTIs ExhiBiTs sOMe cuRiOuS
-            HybRId ANd cHimERic BEhaVIoRS THAT refER boTh To PLanTS aND anImAls
-            NOT mUCh IS KNown of ITs AnAtomY or BEhavioR bUt THE desiGn Of tHIs
-            scuLptUre IMPLIeS thAT it seRvED As A KIND OF rELIGiOus objeCT as
-            well As A FOCuS fOr RItuaL actIViTY antHrOPOLOGIsTS hAvE surmiSEd
-            THAt IT MIgHt HaVE been uSED iN praCtICES rELatING to thERIaNtHROpy
-            or ShaPeShIfTING where IDEnTiTy gEnDeR sPecIes AnD genUS are fLuid
-            In tHE CoNtExt OF THE ritUAl sPACE wIthoUt OtheR ArtifacTS we Can
-            oNLY GUESs at thE nAtURe OF ThE SocieTY ThAt CReatEd thIS ObJeCT aNd
-            how thEiR PEOPle MIghT HAVE lIveD aRTiFacts FROM THE age Of COLLApSe
-        </p>
-        <p>
-            HOmOcuLUS B ORChId MANtIs THIS SCulptURaL STUDy oF the lIFefOrm
-            KnowN aS coLlOQUIaLLY AS THe ORCHId MANTIs ExhiBiTs sOMe cuRiOuS
-            HybRId ANd cHimERic BEhaVIoRS THAT refER boTh To PLanTS aND anImAls
-            NOT mUCh IS KNown of ITs AnAtomY or BEhavioR bUt THE desiGn Of tHIs
-            scuLptUre IMPLIeS thAT it seRvED As A KIND OF rELIGiOus objeCT as
-            well As A FOCuS fOr RItuaL actIViTY antHrOPOLOGIsTS hAvE surmiSEd
-            THAt IT MIgHt HaVE been uSED iN praCtICES rELatING to thERIaNtHROpy
-            or ShaPeShIfTING where IDEnTiTy gEnDeR sPecIes AnD genUS are fLuid
-            In tHE CoNtExt OF THE ritUAl sPACE wIthoUt OtheR ArtifacTS we Can
-            oNLY GUESs at thE nAtURe OF ThE SocieTY ThAt CReatEd thIS ObJeCT aNd
-            how thEiR PEOPle MIghT HAVE lIveD aRTiFacts FROM THE age Of COLLApSe
-        </p>
-        <div>
+        <div id="input">
             <textarea
                 id="textareabox"
                 name="textarea1"
-                placeholder="Start here..."
+                placeholder="Write something ..."
             ></textarea>
-            <input type="button" value="Sample text" onclick="setText()" />
+            <input
+                type="button"
+                value="Ki'ch hoat (means activate)"
+                onclick="setText()"
+            />
+        </div>
+        <div id="viewer">
+            <p style="visibility: hidden; position: absolute">
+                HOmOtgLUS B ORChId MANtIs THIS SCulptURaL STUDy oF the lIFefOrm
+                KnowN aS coLlOQUIaLLY AS THe ORCHId MANTIs ExhiBiTs sOMe cuRiOuS
+                HybRId ANd cHimERic BEhaVIoRS THAT refER boTh To PLanTS aND
+                anImAls NOT mUCh IS KNown of ITs AnAtomY or BEhavioR bUt THE
+                desiGn Of tHIs scuLptUre IMPLIeS thAT it seRvED As A KIND OF
+                rELIGiOus objeCT as well As A FOCuS fOr RItuaL actIViTY
+                antHrOPOLOGIsTS hAvE surmiSEd THAt IT MIgHt HaVE been uSED iN
+                praCtICES rELatING to thERIaNtHROpy or ShaPeShIfTING where
+                IDEnTiTy gEnDeR sPecIes AnD genUS are fLuid In tHE CoNtExt OF
+                THE ritUAl sPACE wIthoUt OtheR ArtifacTS we Can oNLY GUESs at
+                thE nAtURe OF ThE SocieTY ThAt CReatEd thIS ObJeCT aNd how thEiR
+                PEOPle MIghT HAVE lIveD aRTiFacts FROM THE age Of COLLApSe
+            </p>
+            <p>
+                HOmOtgLUS B ORChId MANtIs THIS SCulptURaL STUDy oF the lIFefOrm
+                KnowN aS coLlOQUIaLLY AS THe ORCHId MANTIs ExhiBiTs sOMe cuRiOuS
+                HybRId ANd cHimERic BEhaVIoRS THAT refER boTh To PLanTS aND
+                anImAls NOT mUCh IS KNown of ITs AnAtomY or BEhavioR bUt THE
+                desiGn Of tHIs scuLptUre IMPLIeS thAT it seRvED As A KIND OF
+                rELIGiOus objeCT as well As A FOCuS fOr RItuaL actIViTY
+                antHrOPOLOGIsTS hAvE surmiSEd THAt IT MIgHt HaVE been uSED iN
+                praCtICES rELatING to thERIaNtHROpy or ShaPeShIfTING where
+                IDEnTiTy gEnDeR sPecIes AnD genUS are fLuid In tHE CoNtExt OF
+                THE ritUAl sPACE wIthoUt OtheR ArtifacTS we Can oNLY GUESs at
+                thE nAtURe OF ThE SocieTY ThAt CReatEd thIS ObJeCT aNd how thEiR
+                PEOPle MIghT HAVE lIveD aRTiFacts FROM THE age Of COLLApSe
+            </p>
         </div>
     </body>
 </html>
