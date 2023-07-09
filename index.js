@@ -25,6 +25,58 @@ let unit =
     parseFloat(getComputedStyle(document.documentElement).fontSize) /
     (20 / 1.4);
 setprop('--unit', `${unit}px`);
+const scrollbarwidth = getScrollbarWidth();
+const stylecopy = (width) => `
+    @font-face {
+        font-family: 'asabovesobelow';
+        src: url('${window.location.href.replace(
+            'index.html',
+            ''
+        )}AsAbove,SoBelow(Beta40)VF.ttf');
+    }
+
+    :root {
+        --unit: ${unit}px;
+    }
+
+    * {
+        box-sizing: border-box;
+        font-family: asabovesobelow;
+        font-size: 20px;
+        line-height: 3.64em;
+        margin: 0;
+        padding: 0;
+        font-variation-settings: 'wght' 0;
+        color: white;
+        font-kerning: normal;
+    }
+
+    body {
+        background-color: black;
+    }
+
+    p {
+        width: ${width};
+    }
+
+    span {
+        transition: font-variation-settings 0.5s;
+        font-variation-settings: 'wght' 0;
+        font-kerning: none;
+    }
+
+    span.alt {
+        font-variation-settings: 'wght' 100;
+    }
+
+    span.altshort {
+        font-variation-settings: 'wght' 90;
+    }
+
+    p span:last-child {
+        visibility: hidden;
+    }
+`;
 const list = new (function () {
     this._construct = function (
         letter,
@@ -508,7 +560,7 @@ function extractLinesFromTextNode(textNode) {
         for (let i = 0; i < allspan.length; i++) {
             allspan[i].classList.add(allspan[i].wght);
         }
-        console.log(textconsole);
+        //console.log(textconsole);
     }
 }
 
@@ -560,4 +612,46 @@ function onresize_() {
         timeout = null;
         checkrs = true;
     }, 600);
+}
+
+function pdfprint() {
+    let wh = p.getBoundingClientRect();
+    let WinPrint = window.open(
+        '',
+        '',
+        `left=0,top=0,width=${wh.width + scrollbarwidth + 20},height=${
+            wh.height
+        },toolbar=0,scrollbars=0,status=0`
+    );
+    let style = $create('style');
+    style.innerHTML = stylecopy(wh.width);
+    WinPrint.document.head.append(style);
+    WinPrint.document.body.innerHTML = p.outerHTML;
+    WinPrint.document.close();
+    WinPrint.focus();
+    setTimeout(() => {
+        WinPrint.print();
+        WinPrint.close();
+    }, 1000);
+}
+
+function getScrollbarWidth() {
+    // Creating invisible container
+    const outer = document.createElement('div');
+    outer.style.visibility = 'hidden';
+    outer.style.overflow = 'scroll'; // forcing scrollbar to appear
+    outer.style.msOverflowStyle = 'scrollbar'; // needed for WinJS apps
+    document.body.appendChild(outer);
+
+    // Creating inner element and placing it in the container
+    const inner = document.createElement('div');
+    outer.appendChild(inner);
+
+    // Calculating difference between container's full width and the child width
+    const scrollbarWidth = outer.offsetWidth - inner.offsetWidth;
+
+    // Removing temporary elements from the DOM
+    outer.parentNode.removeChild(outer);
+
+    return scrollbarWidth;
 }

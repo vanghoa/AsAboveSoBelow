@@ -10,12 +10,6 @@
                 src: url('AsAbove,SoBelow(Beta40)VF.ttf');
             }
 
-            @font-feature-values "asabovesobelow" {
-                @styleset {
-                    alt: 1;
-                }
-            }
-
             :root {
                 --unit: 0px;
             }
@@ -69,6 +63,7 @@
 
             #input {
                 width: 100%;
+                line-height: 0px;
             }
 
             input {
@@ -85,7 +80,7 @@
                 font-family: Arial, Helvetica, sans-serif;
                 font-size: 15px;
                 line-height: 1.5em;
-                display: block;
+                display: inline-block;
             }
 
             #viewer {
@@ -121,6 +116,7 @@
                 value="Ki'ch hoat (means activate)"
                 onclick="setText()"
             />
+            <input type="button" value="print" onclick="pdfprint()" />
         </div>
         <div id="viewer">
             <p style="visibility: hidden; position: absolute">
