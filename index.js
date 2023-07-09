@@ -573,14 +573,16 @@ function wait(delay) {
 }
 
 async function setText() {
+    //console.log(document.getElementById('textareabox').value);
     let text = document
         .getElementById('textareabox')
-        .value.replace(/[0-9]/g, '');
+        .value.replace(/[%*{}]/g, '');
     px.innerHTML =
         p.innerHTML =
         document.getElementById('textareabox').value =
             text;
     pnode = px.firstChild;
+    console.log(px.firstChild);
     await wait(200);
     extractLinesFromTextNode(pnode);
 }
