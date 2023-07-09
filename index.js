@@ -167,7 +167,7 @@ buffer.then((data) => {
     list.lowercase('u', 63, [8], [2, 8], [3, 4]);
     list.lowercase('ü', 63, [8], [], [3, 4]);
     list.lowercase('v', 49, [], [1]);
-    list.lowercase('w', 84, [], [2, 6]);
+    list.lowercase('w', 84, [], [1, 6]);
     list.lowercase('x', 49, [7], [1]);
     list.lowercase('z', 49);
     // punctuation

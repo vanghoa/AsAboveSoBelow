@@ -1,5 +1,8 @@
-const buffer = fetch('/AsAboveSoBelow/AsAbove,SoBelow(Beta40)VF.ttf').then(
-    (res) => res.arrayBuffer()
-);
+const buffer = fetch(
+    `${window.location.pathname.replace(
+        'index.html',
+        ''
+    )}AsAbove,SoBelow(Beta40)VF.ttf`
+).then((res) => res.arrayBuffer());
 
 let font;
