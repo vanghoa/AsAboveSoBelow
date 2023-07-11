@@ -18,6 +18,7 @@ const setprop = rootstyle.setProperty.bind(rootstyle);
 const px = $('#viewer p');
 const p = $$('#viewer p')[1];
 const viewer = $('#viewer');
+let resizecheck = true;
 let pnode = px.firstChild;
 let timeout = null;
 let ready = 0;
@@ -561,6 +562,10 @@ function extractLinesFromTextNode(textNode) {
             allspan[i].classList.add(allspan[i].wght);
         }
         //console.log(textconsole);
+        if (resizecheck) {
+            resizeObserver.observe(viewer);
+            resizecheck = false;
+        }
     }
 }
 
@@ -573,6 +578,8 @@ function wait(delay) {
 }
 
 async function setText() {
+    resizeObserver.disconnect();
+    resizecheck = true;
     //console.log(document.getElementById('textareabox').value);
     let text = document
         .getElementById('textareabox')
@@ -589,8 +596,6 @@ async function setText() {
 
 //window.onresize = onresize_;
 const resizeObserver = new ResizeObserver(onresize_);
-
-resizeObserver.observe(viewer);
 
 let checkrs = true;
 function onresize_() {
