@@ -15,11 +15,11 @@ const getprop = proproot.getPropertyValue.bind(proproot);
 const rootstyle = root.style;
 const setprop = rootstyle.setProperty.bind(rootstyle);
 
-const px = $('#viewer p');
-const p = $$('#viewer p')[1];
+const divx = $('#viewer div');
+const div = $$('#viewer div')[1];
 const viewer = $('#viewer');
 let resizecheck = true;
-let pnode = px.firstChild;
+//let pnode = px.firstChild;
 let timeout = null;
 let ready = 0;
 let unit =
@@ -72,10 +72,6 @@ const stylecopy = (width) => `
 
     span.altshort {
         font-variation-settings: 'wght' 90;
-    }
-
-    p span:last-child {
-        visibility: hidden;
     }
 `;
 const list = new (function () {
@@ -310,90 +306,107 @@ window.addEventListener('load', readyToExecute);
 
 function readyToExecute() {
     if (++ready == 2) {
-        extractLinesFromTextNode(pnode);
+        extractLinesFromTextNode();
     }
 }
 
-function extractLinesFromTextNode(textNode) {
-    if (textNode.nodeType !== 3) {
-        throw new Error('Lines can only be extracted from text nodes.');
-    }
-    textNode.textContent = collapseWhiteSpace(textNode.textContent);
-    let p_ = document.createDocumentFragment();
-    p_.append($create('br'));
-    let textContent = textNode.textContent;
-    let range = document.createRange();
-    let lines = [];
-    let lineCharacters = [];
-    let up_arr = [];
-    let up_arr_tong = [];
+async function extractLinesFromTextNode() {
+    await wait(200);
+    div.innerHTML = '';
 
-    let down_arr_span = [];
-    let down_arr_span_tong = [];
-    let down_arr = [];
-    let down_arr_tong = [];
-    let up_arr_span = [];
-    let all_span = [];
+    let parr = divx.querySelectorAll('p');
+    let up_arr_prev = [];
+    let down_arr_span_prev = [];
+    let render_arr_arr = [];
 
-    let count = 0;
-    let tong = 0;
-    let spancount = 0;
+    for (let i = 0; i < parr.length; i++) {
+        let textNode = parr[i].firstChild;
+        if (textNode.nodeType !== 3) {
+            throw new Error('Lines can only be extracted from text nodes.');
+        }
+        textNode.textContent = collapseWhiteSpace(textNode.textContent);
+        let textContent = textNode.textContent;
+        let range = document.createRange();
+        let lines = [];
+        let lineCharacters = [];
+        let up_arr = [];
+        let up_arr_tong = [];
 
-    let render_arr = [[]];
+        let down_arr_span = [];
+        let down_arr_span_tong = [];
+        let down_arr = [];
+        let down_arr_tong = [];
+        let up_arr_span = [];
+        let all_span = [];
 
-    let textconsole = [''];
+        let count = 0;
+        let tong = 0;
+        let spancount = 0;
 
-    lines.push((lineCharacters = []));
-    up_arr_tong.push((up_arr = []));
-    down_arr_span_tong.push((down_arr_span = []));
-    down_arr_tong.push((down_arr = []));
+        let render_arr = [[]];
 
-    myEndFunction();
-
-    async function myEndFunction() {
+        let textconsole = [''];
         let baretxt = '';
-        for (let i = 0; i < textContent.length; i++) {
-            range.setStart(textNode, 0);
-            range.setEnd(textNode, i + 1);
-            if (count != range.getClientRects().length - 1) {
-                count++;
-                textconsole[count] = '';
-                tong = 0;
-                lines.push((lineCharacters = []));
-                up_arr_tong.push((up_arr = []));
 
-                down_arr_span_tong.push((down_arr_span = []));
-                down_arr_tong.push((down_arr = []));
+        lines.push((lineCharacters = []));
+        up_arr_tong.push((up_arr = []));
+        down_arr_span_tong.push((down_arr_span = []));
+        down_arr_tong.push((down_arr = []));
 
-                render_arr.push([]);
-            }
-            let check = false;
-            let string = textContent[i];
-            let char = list[string];
-            let kern = 0;
-            let kernr = 0;
-            if (tong != 0) {
-                kern =
-                    font.getKerningValue(
-                        font.charToGlyph(textContent[i - 1]),
-                        font.charToGlyph(string)
-                    ) / 70;
-            }
-            if (i + 1 < textContent.length) {
-                kernr =
-                    font.getKerningValue(
-                        font.charToGlyph(string),
-                        font.charToGlyph(textContent[i + 1])
-                    ) / 70;
-            }
-            tong += kern;
-            //
-            textconsole[count] += string;
-            // do not need to check
-            if (count > 0) {
+        render_arr_create();
+
+        //console.log(textconsole);
+
+        render_arr_arr.push(render_arr);
+        up_arr_prev = up_arr_tong[up_arr_tong.length - 1];
+        down_arr_span_prev = down_arr_span_tong[down_arr_span_tong.length - 1];
+
+        function render_arr_create() {
+            //main area
+            for (let i = 0; i < textContent.length; i++) {
+                range.setStart(textNode, 0);
+                range.setEnd(textNode, i + 1);
+                if (count != range.getClientRects().length - 1) {
+                    count++;
+                    textconsole[count] = '';
+                    tong = 0;
+                    lines.push((lineCharacters = []));
+                    up_arr_tong.push((up_arr = []));
+
+                    down_arr_span_tong.push((down_arr_span = []));
+                    down_arr_tong.push((down_arr = []));
+
+                    render_arr.push([]);
+                }
+                let check = false;
+                let string = textContent[i];
+                let char = list[string];
+                let kern = 0;
+                let kernr = 0;
+                if (tong != 0) {
+                    kern =
+                        font.getKerningValue(
+                            font.charToGlyph(textContent[i - 1]),
+                            font.charToGlyph(string)
+                        ) / 70;
+                }
+                if (i + 1 < textContent.length) {
+                    kernr =
+                        font.getKerningValue(
+                            font.charToGlyph(string),
+                            font.charToGlyph(textContent[i + 1])
+                        ) / 70;
+                }
+                tong += kern;
+                //
+                textconsole[count] += string;
+                // do not need to check
                 if (char.st_up) {
-                    let ua = up_arr_tong[count - 1][tong + char.vl_up - 1]; // + kern
-                    ua = ua == undefined ? { chek: true, for_f: true } : ua;
+                    let ua =
+                        count > 0
+                            ? up_arr_tong[count - 1][tong + char.vl_up - 1]
+                            : up_arr_prev[tong + char.vl_up - 1]; // + kern
+                    ua = ua == undefined ? { chek: true, for_f: false } : ua;
                     if (ua.chek) {
                         if (ua.for_f) {
                             check = string == 'f';
@@ -402,71 +415,64 @@ function extractLinesFromTextNode(textNode) {
                         }
                     }
                 }
-            } else {
-                if (char.st_up) {
+                //
+
+                if (char.st_down) {
                     check = true;
                 }
-            }
-            //
 
-            if (char.st_down) {
-                check = true;
-            }
+                // render_arr
+                if (check) {
+                    let span = $create('span');
+                    span.append(string);
+                    span.wght = 'alt';
+                    span.style.marginLeft = `calc(${kern} * var(--unit))`;
+                    span.style.marginRight = `calc(${kernr} * var(--unit))`;
+                    if (char.st_down) {
+                        let tempvl = tong + char.vl_down - 1;
+                        //let count = spancount;
+                        down_arr_span.push({
+                            tempvl,
+                            count: spancount,
+                            nested1: count,
+                            nested2:
+                                baretxt == ''
+                                    ? render_arr[count].length
+                                    : render_arr[count].length + 1,
+                        });
+                    }
 
-            // render_arr
-            if (check) {
-                let span = $create('span');
-                span.append(string);
-                span.wght = 'alt';
-                span.style.marginLeft = `calc(${kern} * var(--unit))`;
-                span.style.marginRight = `calc(${kernr} * var(--unit))`;
-                if (char.st_down) {
-                    let tempvl = tong + char.vl_down - 1;
-                    //let count = spancount;
-                    down_arr_span.push({
-                        tempvl,
-                        count: spancount,
-                        nested1: count,
-                        nested2:
-                            baretxt == ''
-                                ? render_arr[count].length
-                                : render_arr[count].length + 1,
+                    if (baretxt == '') {
+                        render_arr[count].push(span);
+                        //p_.append(span);
+                    } else {
+                        render_arr[count].push(baretxt, span);
+                        //p_.append(baretxt, span);
+                    }
+
+                    baretxt = '';
+                    spancount++;
+                } else {
+                    baretxt += string;
+                    //p_.append(string);
+                }
+
+                // + kern
+                for (let i = 1; i <= char.width; i++) {
+                    up_arr.push({
+                        chek: false,
+                        for_f: false,
                     });
                 }
 
-                if (baretxt == '') {
-                    render_arr[count].push(span);
-                    //p_.append(span);
-                } else {
-                    render_arr[count].push(baretxt, span);
-                    //p_.append(baretxt, span);
+                for (let i = 0; i < char.ps_up.length; i++) {
+                    up_arr[tong + char.ps_up[i] - 1].chek = true;
                 }
 
-                baretxt = '';
-                spancount++;
-            } else {
-                baretxt += string;
-                //p_.append(string);
-            }
-
-            // + kern
-            for (let i = 1; i <= char.width; i++) {
-                up_arr.push({
-                    chek: false,
-                    for_f: false,
-                });
-            }
-
-            for (let i = 0; i < char.ps_up.length; i++) {
-                up_arr[tong + char.ps_up[i] - 1].chek = true;
-            }
-
-            for (let i = 0; i < char.ps_up_for_f.length; i++) {
-                up_arr[tong + char.ps_up_for_f[i] - 1].chek = true;
-                up_arr[tong + char.ps_up_for_f[i] - 1].for_f = true;
-            }
-            // + kern
-            if (count > 0) {
+                for (let i = 0; i < char.ps_up_for_f.length; i++) {
+                    up_arr[tong + char.ps_up_for_f[i] - 1].chek = true;
+                    up_arr[tong + char.ps_up_for_f[i] - 1].for_f = true;
+                }
                 // + kern
                 for (let i = 1; i <= char.width; i++) {
                     down_arr.push([false, char.cap]);
@@ -475,76 +481,86 @@ function extractLinesFromTextNode(textNode) {
                     down_arr[tong + char.ps_down[i] - 1][0] = true;
                 }
                 // + kern
+
+                tong += char.width;
+                lineCharacters.push(textContent.charAt(i));
+            }
+            if (baretxt !== '') {
+                render_arr[count].push(baretxt);
             }
 
-            tong += char.width;
-            lineCharacters.push(textContent.charAt(i));
-        }
+            //spacing below
+            let descenderlength = down_arr_span_tong.length;
+            if (i == parr.length - 1) {
+                let span_ = $create('span');
+                span_.innerHTML = 'a';
+                span_.style.visibility = 'hidden';
+                render_arr[count].push($create('br'), span_);
+                descenderlength--;
+            }
 
-        let span_ = $create('span');
-        span_.innerHTML = 'a';
-        if (baretxt == '') {
-            render_arr[count].push($create('br'), span_);
-            //p_.append($create('br'), span_);
-        } else {
-            render_arr[count].push(baretxt, $create('br'), span_);
-            //p_.append(baretxt, $create('br'), span_);
-        }
+            //descender_prev
+            {
+                let spans = down_arr_span_prev;
+                let arrs = down_arr_tong[0];
+                let render_arr = render_arr_arr[render_arr_arr.length - 1];
+                for (let a = 0; a < spans.length; a++) {
+                    if (arrs[spans[a].tempvl] == undefined) {
+                        render_arr[spans[a].nested1][spans[a].nested2].wght =
+                            'alt';
+                    } else if (arrs[spans[a].tempvl][0]) {
+                        render_arr[spans[a].nested1][spans[a].nested2].wght =
+                            arrs[spans[a].tempvl][1] ? 'altshort' : 'alt';
+                    } else {
+                        render_arr[spans[a].nested1][spans[a].nested2] =
+                            render_arr[spans[a].nested1][
+                                spans[a].nested2
+                            ].innerHTML;
+                    }
+                }
+            }
+            //descender
+            for (let i = 0; i < descenderlength; i++) {
+                let spans = down_arr_span_tong[i];
+                let arrs = down_arr_tong[i + 1];
 
-        //descender
-        //const desspan = p.querySelectorAll('span');
-        for (let i = 0; i < down_arr_span_tong.length - 1; i++) {
-            let spans = down_arr_span_tong[i];
-            let arrs = down_arr_tong[i + 1];
-
-            for (let a = 0; a < spans.length; a++) {
-                if (arrs[spans[a].tempvl] == undefined) {
-                    render_arr[spans[a].nested1][spans[a].nested2].wght = 'alt';
-                    //desspan[spans[a].count].classList.add('alt');
-                    //continue;
-                } else if (arrs[spans[a].tempvl][0]) {
-                    render_arr[spans[a].nested1][spans[a].nested2].wght = arrs[
-                        spans[a].tempvl
-                    ][1]
-                        ? 'altshort'
-                        : 'alt';
-                    /*desspan[spans[a].count].classList.add(
-                        arrs[spans[a].tempvl][1] ? 'altshort' : 'alt'
-                    );*/
-                    //continue;
-                } else {
-                    render_arr[spans[a].nested1][spans[a].nested2] =
-                        render_arr[spans[a].nested1][
-                            spans[a].nested2
-                        ].innerHTML;
+                for (let a = 0; a < spans.length; a++) {
+                    if (i == down_arr_span_tong.length - 1) {
+                        continue;
+                    } else if (arrs[spans[a].tempvl] == undefined) {
+                        render_arr[spans[a].nested1][spans[a].nested2].wght =
+                            'alt';
+                    } else if (arrs[spans[a].tempvl][0]) {
+                        render_arr[spans[a].nested1][spans[a].nested2].wght =
+                            arrs[spans[a].tempvl][1] ? 'altshort' : 'alt';
+                    } else {
+                        render_arr[spans[a].nested1][spans[a].nested2] =
+                            render_arr[spans[a].nested1][
+                                spans[a].nested2
+                            ].innerHTML;
+                    }
                 }
             }
         }
-        //ascender
-        /*
-        for (let i = 0; i < up_arr_span.length; i++) {
-            desspan[up_arr_span[i]].classList.add('alt');
-        }
-        */
-        //lastline
-        /*
-        let spans = down_arr_span_tong[down_arr_span_tong.length - 1];
-        for (let a = 0; a < spans.length; a++) {
-            desspan[spans[a].count].classList.add('alt');
-        }
-        */
+    }
 
-        // fully render
-        for (let i = 0; i < render_arr.length; i++) {
+    // fully render
+    for (let x = 0; x < render_arr_arr.length; x++) {
+        let p_ = $create('p');
+        //spacing above
+        if (x == 0 || render_arr_arr[x][0].length == 0) {
+            p_.append($create('br'));
+        }
+        for (let i = 0; i < render_arr_arr[x].length; i++) {
             let baretxt = '';
-            for (let k = 0; k < render_arr[i].length; k++) {
-                if (typeof render_arr[i][k] == 'string') {
-                    baretxt += render_arr[i][k];
+            for (let k = 0; k < render_arr_arr[x][i].length; k++) {
+                if (typeof render_arr_arr[x][i][k] == 'string') {
+                    baretxt += render_arr_arr[x][i][k];
                 } else {
                     if (baretxt == '') {
-                        p_.append(render_arr[i][k]);
+                        p_.append(render_arr_arr[x][i][k]);
                     } else {
-                        p_.append(baretxt, render_arr[i][k]);
+                        p_.append(baretxt, render_arr_arr[x][i][k]);
                     }
                     baretxt = '';
                 }
@@ -553,19 +569,19 @@ function extractLinesFromTextNode(textNode) {
                 p_.append(baretxt);
             }
         }
-        p.innerHTML = '';
-        p.append(p_);
-        // animation
-        await wait(100);
-        let allspan = p.querySelectorAll('span');
-        for (let i = 0; i < allspan.length; i++) {
-            allspan[i].classList.add(allspan[i].wght);
-        }
-        //console.log(textconsole);
-        if (resizecheck) {
-            resizeObserver.observe(viewer);
-            resizecheck = false;
-        }
+        div.append(p_);
+    }
+
+    // animation
+    await wait(100);
+    let allspan = viewer.querySelectorAll('span');
+    for (let i = 0; i < allspan.length; i++) {
+        allspan[i].classList.add(allspan[i].wght);
+    }
+    //
+    if (resizecheck) {
+        resizeObserver.observe(viewer);
+        resizecheck = false;
     }
 }
 
@@ -584,14 +600,18 @@ async function setText() {
     let text = document
         .getElementById('textareabox')
         .value.replace(/[%*{}]/g, '');
-    px.innerHTML =
-        p.innerHTML =
-        document.getElementById('textareabox').value =
-            text;
-    pnode = px.firstChild;
-    console.log(px.firstChild);
-    await wait(200);
-    extractLinesFromTextNode(pnode);
+    document.getElementById('textareabox').value = text;
+    //
+    let textarr = text.split('\n');
+    divx.innerHTML = '';
+    for (let i = 0; i < textarr.length; i++) {
+        let p__ = $create('p');
+        let textnode = document.createTextNode(textarr[i]);
+        p__.appendChild(textnode);
+        divx.append(p__);
+    }
+
+    extractLinesFromTextNode();
 }
 
 //window.onresize = onresize_;
@@ -601,9 +621,9 @@ let checkrs = true;
 function onresize_() {
     if (checkrs) {
         let spanani =
-            p.querySelector('span.alt') || p.querySelector('span.altshort');
+            div.querySelector('span.alt') || div.querySelector('span.altshort');
         if (spanani) {
-            let spaninit = p.querySelectorAll('span');
+            let spaninit = div.querySelectorAll('span');
             for (let i = 0; i < spaninit.length; i++) {
                 spaninit[i].className = '';
             }
@@ -615,14 +635,14 @@ function onresize_() {
         clearTimeout(timeout);
     }
     timeout = setTimeout(function () {
-        extractLinesFromTextNode(pnode);
+        extractLinesFromTextNode();
         timeout = null;
         checkrs = true;
     }, 600);
 }
 
 function pdfprint() {
-    let wh = p.getBoundingClientRect();
+    let wh = div.getBoundingClientRect();
     let WinPrint = window.open(
         '',
         '',
@@ -633,7 +653,7 @@ function pdfprint() {
     let style = $create('style');
     style.innerHTML = stylecopy(wh.width);
     WinPrint.document.head.append(style);
-    WinPrint.document.body.innerHTML = p.outerHTML;
+    WinPrint.document.body.innerHTML = div.outerHTML;
     WinPrint.document.close();
     WinPrint.focus();
     setTimeout(() => {

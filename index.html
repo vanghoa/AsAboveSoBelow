@@ -57,10 +57,6 @@
                 width: 100%;
             }
 
-            p span:last-child {
-                visibility: hidden;
-            }
-
             #input {
                 width: 100%;
                 line-height: 0px;
@@ -87,15 +83,23 @@
                 width: 100%;
                 max-width: 100%;
                 position: relative;
-                margin-top: -2rem;
                 resize: horizontal;
-                overflow: auto;
+                overflow: hidden;
                 background: linear-gradient(
                     135deg,
                     black 0,
                     black 98%,
                     #fff 98.001%
                 );
+            }
+
+            #viewer > div {
+                position: relative;
+                width: 100%;
+                max-width: 100%;
+                overflow: auto;
+                left: 0;
+                top: 0;
             }
         </style>
         <script src="lodash.custom.min.js"></script>
@@ -119,34 +123,40 @@
             <input type="button" value="print" onclick="pdfprint()" />
         </div>
         <div id="viewer">
-            <p style="visibility: hidden; position: absolute">
-                HOmOtgLUS B ORChId MANtIs THIS SCulptURaL STUDy oF the lIFefOrm
-                KnowN aS coLlOQUIaLLY AS THe ORCHId MANTIs ExhiBiTs sOMe cuRiOuS
-                HybRId ANd cHimERic BEhaVIoRS THAT refER boTh To PLanTS aND
-                anImAls NOT mUCh IS KNown of ITs AnAtomY or BEhavioR bUt THE
-                desiGn Of tHIs scuLptUre IMPLIeS thAT it seRvED As A KIND OF
-                rELIGiOus objeCT as well As A FOCuS fOr RItuaL actIViTY
-                antHrOPOLOGIsTS hAvE surmiSEd THAt IT MIgHt HaVE been uSED iN
-                praCtICES rELatING to thERIaNtHROpy or ShaPeShIfTING where
-                IDEnTiTy gEnDeR sPecIes AnD genUS are fLuid In tHE CoNtExt OF
-                THE ritUAl sPACE wIthoUt OtheR ArtifacTS we Can oNLY GUESs at
-                thE nAtURe OF ThE SocieTY ThAt CReatEd thIS ObJeCT aNd how thEiR
-                PEOPle MIghT HAVE lIveD aRTiFacts FROM THE age Of COLLApSe
-            </p>
-            <p>
-                HOmOtgLUS B ORChId MANtIs THIS SCulptURaL STUDy oF the lIFefOrm
-                KnowN aS coLlOQUIaLLY AS THe ORCHId MANTIs ExhiBiTs sOMe cuRiOuS
-                HybRId ANd cHimERic BEhaVIoRS THAT refER boTh To PLanTS aND
-                anImAls NOT mUCh IS KNown of ITs AnAtomY or BEhavioR bUt THE
-                desiGn Of tHIs scuLptUre IMPLIeS thAT it seRvED As A KIND OF
-                rELIGiOus objeCT as well As A FOCuS fOr RItuaL actIViTY
-                antHrOPOLOGIsTS hAvE surmiSEd THAt IT MIgHt HaVE been uSED iN
-                praCtICES rELatING to thERIaNtHROpy or ShaPeShIfTING where
-                IDEnTiTy gEnDeR sPecIes AnD genUS are fLuid In tHE CoNtExt OF
-                THE ritUAl sPACE wIthoUt OtheR ArtifacTS we Can oNLY GUESs at
-                thE nAtURe OF ThE SocieTY ThAt CReatEd thIS ObJeCT aNd how thEiR
-                PEOPle MIghT HAVE lIveD aRTiFacts FROM THE age Of COLLApSe
-            </p>
+            <div style="position: absolute; visibility: hidden">
+                <p>
+                    HOmOtgLUS B ORChId MANtIs THIS SCulptURaL STUDy oF the
+                    lIFefOrm KnowN aS coLlOQUIaLLY AS THe ORCHId MANTIs ExhiBiTs
+                    sOMe cuRiOuS HybRId ANd cHimERic BEhaVIoRS THAT refER boTh
+                    To PLanTS aND anImAls NOT mUCh IS KNown of ITs AnAtomY or
+                    BEhavioR bUt THE desiGn Of tHIs scuLptUre IMPLIeS thAT it
+                    seRvED As A KIND OF rELIGiOus objeCT as well As A FOCuS fOr
+                    RItuaL actIViTY antHrOPOLOGIsTS hAvE surmiSEd THAt IT MIgHt
+                    HaVE been uSED iN praCtICES rELatING to thERIaNtHROpy or
+                    ShaPeShIfTING where IDEnTiTy gEnDeR sPecIes AnD genUS are
+                    fLuid In tHE CoNtExt OF THE ritUAl sPACE wIthoUt OtheR
+                    ArtifacTS we Can oNLY GUESs at thE nAtURe OF ThE SocieTY
+                    ThAt CReatEd thIS ObJeCT aNd how thEiR PEOPle MIghT HAVE
+                    lIveD aRTiFacts FROM THE age Of COLLApSe
+                </p>
+            </div>
+            <div>
+                <p>
+                    HOmOtgLUS B ORChId MANtIs THIS SCulptURaL STUDy oF the
+                    lIFefOrm KnowN aS coLlOQUIaLLY AS THe ORCHId MANTIs ExhiBiTs
+                    sOMe cuRiOuS HybRId ANd cHimERic BEhaVIoRS THAT refER boTh
+                    To PLanTS aND anImAls NOT mUCh IS KNown of ITs AnAtomY or
+                    BEhavioR bUt THE desiGn Of tHIs scuLptUre IMPLIeS thAT it
+                    seRvED As A KIND OF rELIGiOus objeCT as well As A FOCuS fOr
+                    RItuaL actIViTY antHrOPOLOGIsTS hAvE surmiSEd THAt IT MIgHt
+                    HaVE been uSED iN praCtICES rELatING to thERIaNtHROpy or
+                    ShaPeShIfTING where IDEnTiTy gEnDeR sPecIes AnD genUS are
+                    fLuid In tHE CoNtExt OF THE ritUAl sPACE wIthoUt OtheR
+                    ArtifacTS we Can oNLY GUESs at thE nAtURe OF ThE SocieTY
+                    ThAt CReatEd thIS ObJeCT aNd how thEiR PEOPle MIghT HAVE
+                    lIveD aRTiFacts FROM THE age Of COLLApSe
+                </p>
+            </div>
         </div>
     </body>
 </html>
