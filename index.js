@@ -2,18 +2,6 @@
 // 'b,d,f,h,k,l,t';
 // 'g,j,p,q,y';
 // binding method
-const $ = document.querySelector.bind(document);
-const $$ = document.querySelectorAll.bind(document);
-const $create = document.createElement.bind(document);
-const $createcomment = document.createComment.bind(document);
-// binding method
-const root = document.querySelector(':root');
-const proproot = getComputedStyle(root);
-const getprop = proproot.getPropertyValue.bind(proproot);
-
-// binding method
-const rootstyle = root.style;
-const setprop = rootstyle.setProperty.bind(rootstyle);
 
 const divx = $('#viewer div');
 const div = $$('#viewer div')[1];
@@ -30,10 +18,7 @@ const scrollbarwidth = getScrollbarWidth();
 const stylecopy = (width) => `
     @font-face {
         font-family: 'asabovesobelow';
-        src: url('${window.location.href.replace(
-            'index.html',
-            ''
-        )}AsAbove,SoBelow(Beta40)VF.ttf');
+        src: url('${window.location.href.replace('index.html', '')}${fonturl}');
     }
 
     :root {
