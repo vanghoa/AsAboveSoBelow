@@ -351,6 +351,7 @@ async function extractLinesFromTextNode() {
             for (let i = 0; i < textContent.length; i++) {
                 range.setStart(textNode, 0);
                 range.setEnd(textNode, i + 1);
+                //change line
                 if (count != range.getClientRects().length - 1) {
                     count++;
                     textconsole[count] = '';
@@ -365,9 +366,11 @@ async function extractLinesFromTextNode() {
                 }
                 let check = false;
                 let string = textContent[i];
+                textconsole[count] += string;
                 let char = list[string];
                 let kern = 0;
                 let kernr = 0;
+                // kern
                 if (tong != 0) {
                     kern =
                         font.getKerningValue(
@@ -383,9 +386,7 @@ async function extractLinesFromTextNode() {
                         ) / 70;
                 }
                 tong += kern;
-                //
-                textconsole[count] += string;
-                // do not need to check
+                // check
                 if (char.st_up) {
                     let ua =
                         count > 0
@@ -400,8 +401,6 @@ async function extractLinesFromTextNode() {
                         }
                     }
                 }
-                //
-
                 if (char.st_down) {
                     check = true;
                 }
@@ -415,7 +414,6 @@ async function extractLinesFromTextNode() {
                     span.style.marginRight = `calc(${kernr} * var(--unit))`;
                     if (char.st_down) {
                         let tempvl = tong + char.vl_down - 1;
-                        //let count = spancount;
                         down_arr_span.push({
                             tempvl,
                             count: spancount,
@@ -429,20 +427,17 @@ async function extractLinesFromTextNode() {
 
                     if (baretxt == '') {
                         render_arr[count].push(span);
-                        //p_.append(span);
                     } else {
                         render_arr[count].push(baretxt, span);
-                        //p_.append(baretxt, span);
                     }
 
                     baretxt = '';
                     spancount++;
                 } else {
                     baretxt += string;
-                    //p_.append(string);
                 }
 
-                // + kern
+                // up_arr
                 for (let i = 1; i <= char.width; i++) {
                     up_arr.push({
                         chek: false,
@@ -452,20 +447,24 @@ async function extractLinesFromTextNode() {
 
                 for (let i = 0; i < char.ps_up.length; i++) {
                     up_arr[tong + char.ps_up[i] - 1].chek = true;
+                    up_arr[tong + char.ps_up[i] - 1].for_f = false;
                 }
 
                 for (let i = 0; i < char.ps_up_for_f.length; i++) {
                     up_arr[tong + char.ps_up_for_f[i] - 1].chek = true;
                     up_arr[tong + char.ps_up_for_f[i] - 1].for_f = true;
                 }
-                // + kern
+                // down_arr
                 for (let i = 1; i <= char.width; i++) {
-                    down_arr.push([false, char.cap]);
+                    down_arr.push([false, char.cap, string]);
                 }
                 for (let i = 0; i < char.ps_down.length; i++) {
-                    down_arr[tong + char.ps_down[i] - 1][0] = true;
+                    down_arr[tong + char.ps_down[i] - 1] = [
+                        true,
+                        char.cap,
+                        string,
+                    ];
                 }
-                // + kern
 
                 tong += char.width;
                 lineCharacters.push(textContent.charAt(i));
@@ -518,6 +517,7 @@ async function extractLinesFromTextNode() {
                     } else if (arrs[spans[a].tempvl][0]) {
                         render_arr[spans[a].nested1][spans[a].nested2].wght =
                             arrs[spans[a].tempvl][1] ? 'altshort' : 'alt';
+                        //console.log(arrs[spans[a].tempvl][2]);
                     } else {
                         render_arr[spans[a].nested1][spans[a].nested2] =
                             render_arr[spans[a].nested1][
