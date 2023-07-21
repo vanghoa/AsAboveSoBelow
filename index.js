@@ -6,6 +6,9 @@
 const divx = $('#viewer div');
 const div = $$('#viewer div')[1];
 const viewer = $('#viewer');
+const leading = $('#leading');
+const lig_h = $('#lig_h');
+const lig_h_cap = $('#lig_h_cap');
 let resizecheck = true;
 //let pnode = px.firstChild;
 let timeout = null;
@@ -29,7 +32,7 @@ const stylecopy = (width) => `
         box-sizing: border-box;
         font-family: asabovesobelow;
         font-size: 20px;
-        line-height: 3.64em;
+        line-height: calc(${getprop('--lh')} * 3.64em);
         margin: 0;
         padding: 0;
         font-variation-settings: 'wght' 0;
@@ -51,12 +54,17 @@ const stylecopy = (width) => `
         font-kerning: none;
     }
 
-    span.alt {
-        font-variation-settings: 'wght' 100;
+    .lig span.alt {
+        font-variation-settings: 'wght' ${getprop('--lig')};
     }
 
-    span.altshort {
-        font-variation-settings: 'wght' 90;
+    .lig span.altshort {
+        font-variation-settings: 'wght' ${getprop('--lig_cap')};
+    }
+
+    p:first-child:first-line,
+    .lineheightkeep {
+        line-height: 3.64em;
     }
 `;
 const list = new (function () {
@@ -207,8 +215,8 @@ buffer.then((data) => {
     // punctuation
     list.lowercase(' ', 49);
     list.lowercase('.', 28);
-    list.lowercase(',', 21, [2], []);
-    list.lowercase(';', 28, [3], []);
+    list.lowercase(',', 21);
+    list.lowercase(';', 28);
     list.lowercase(':', 28);
     list.cap('!', 35, [], [3]);
     list.cap('?', 49, [], [3, 5]);
@@ -244,7 +252,7 @@ buffer.then((data) => {
     list.cap('D', 77, [2]);
     list.cap('E', 49, [2], []);
     list.cap('F', 49, [2], []);
-    list.cap('G', 84, [11], [], [7, 8]);
+    list.cap('G', 77, [10], [], [7, 8]);
     list.cap('H', 70, [2, 9], [2, 9]);
     list.cap('I', 21, [2], [2]);
     list.cap('J', 21, [], [2]);
@@ -262,7 +270,7 @@ buffer.then((data) => {
     list.cap('V', 56, [], [1]);
     list.cap('W', 105, [], [1, 8]);
     list.cap('X', 63, [9], [1]);
-    list.cap('Y', 63, [5], [1, 9]);
+    list.cap('Y', 77, [6], [2, 10]);
     list.cap('Z', 70, [], []);
     // number
     list.lowercase('0', 56, [], [], [4, 5]);
@@ -288,14 +296,32 @@ buffer.then((data) => {
 });
 
 window.addEventListener('load', readyToExecute);
+leading.oninput = (e) => {
+    let vl = +e.target.value;
+    if (!isNaN(vl) && e.target.value != '') {
+        setprop('--lh', vl);
+    }
+};
+lig_h.oninput = (e) => {
+    let vl = +e.target.value;
+    if (!isNaN(vl) && e.target.value != '') {
+        setprop('--lig', vl);
+    }
+};
+lig_h_cap.oninput = (e) => {
+    let vl = +e.target.value;
+    if (!isNaN(vl) && e.target.value != '') {
+        setprop('--lig_cap', vl);
+    }
+};
 
 function readyToExecute() {
     if (++ready == 2) {
-        extractLinesFromTextNode();
+        delay_calculateLigature();
     }
 }
 
-async function extractLinesFromTextNode() {
+async function calculateLigature() {
     await wait(200);
     div.innerHTML = '';
 
@@ -479,6 +505,7 @@ async function extractLinesFromTextNode() {
                 let span_ = $create('span');
                 span_.innerHTML = 'a';
                 span_.style.visibility = 'hidden';
+                span_.wght = 'lineheightkeep';
                 render_arr[count].push($create('br'), span_);
                 descenderlength--;
             }
@@ -565,7 +592,7 @@ async function extractLinesFromTextNode() {
     }
     //
     if (resizecheck) {
-        resizeObserver.observe(viewer);
+        resizeObserver.observe(divx);
         resizecheck = false;
     }
 }
@@ -596,14 +623,18 @@ async function setText() {
         divx.append(p__);
     }
 
-    extractLinesFromTextNode();
+    delay_calculateLigature();
 }
 
-//window.onresize = onresize_;
-const resizeObserver = new ResizeObserver(onresize_);
+function toggleLig() {
+    div.classList.toggle('lig');
+}
+
+//window.onresize = delay_calculateLigature;
+const resizeObserver = new ResizeObserver(delay_calculateLigature);
 
 let checkrs = true;
-function onresize_() {
+function delay_calculateLigature() {
     if (checkrs) {
         let spanani =
             div.querySelector('span.alt') || div.querySelector('span.altshort');
@@ -620,7 +651,7 @@ function onresize_() {
         clearTimeout(timeout);
     }
     timeout = setTimeout(function () {
-        extractLinesFromTextNode();
+        calculateLigature();
         timeout = null;
         checkrs = true;
     }, 600);

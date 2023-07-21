@@ -7,19 +7,22 @@
         <style>
             :root {
                 --unit: 0px;
-                --fonturl: 'AsAbove,SoBelow(Beta43)VF.ttf';
+                --fonturl: 'AsAbove,SoBelow(Beta44)VF.ttf';
+                --lh: 1;
+                --lig: 100;
+                --lig_cap: 90;
             }
 
             @font-face {
                 font-family: 'asabovesobelow';
-                src: url('AsAbove,SoBelow(Beta43)VF.ttf');
+                src: url('AsAbove,SoBelow(Beta44)VF.ttf');
             }
 
             * {
                 box-sizing: border-box;
                 font-family: asabovesobelow;
                 font-size: 20px;
-                line-height: 3.64em;
+                line-height: calc(var(--lh) * 3.64em);
                 margin: 0;
                 padding: 0;
                 font-variation-settings: 'wght' 0;
@@ -32,7 +35,7 @@
             input {
                 background-color: black;
                 padding: 1rem;
-                margin-bottom: 2rem;
+                margin-bottom: 1rem;
             }
 
             body {
@@ -47,12 +50,12 @@
                 font-kerning: none;
             }
 
-            span.alt {
-                font-variation-settings: 'wght' 100;
+            .lig span.alt {
+                font-variation-settings: 'wght' var(--lig);
             }
 
-            span.altshort {
-                font-variation-settings: 'wght' 90;
+            .lig span.altshort {
+                font-variation-settings: 'wght' var(--lig_cap);
             }
 
             p {
@@ -62,6 +65,16 @@
             #input {
                 width: 100%;
                 line-height: 0px;
+            }
+
+            #input > div {
+                max-width: 5rem;
+            }
+
+            #input > div > input {
+                display: block;
+                margin-top: 0.5rem;
+                width: 100%;
             }
 
             input {
@@ -99,9 +112,14 @@
                 position: relative;
                 width: 100%;
                 max-width: 100%;
-                overflow: auto;
+                overflow: hidden; /* overflow */
                 left: 0;
                 top: 0;
+            }
+
+            #viewer > div > p:first-child:first-line,
+            .lineheightkeep {
+                line-height: 3.64em;
             }
         </style>
         <script src="lodash.custom.min.js"></script>
@@ -117,12 +135,26 @@
                 name="textarea1"
                 placeholder="Write something ..."
             ></textarea>
+            <input type="button" value="Sample text" onclick="setText()" />
+            <div>
+                Line height: <br />
+                (1 is standard)
+                <input type="text" value="1" id="leading" />
+            </div>
+            <div>
+                Ligature height (100 is standard)
+                <input type="text" value="100" id="lig_h" />
+            </div>
+            <div>
+                Ligature height for caps (90 is standard)
+                <input type="text" value="90" id="lig_h_cap" />
+            </div>
             <input
                 type="button"
-                value="Ki'ch hoat (means activate)"
-                onclick="setText()"
+                value="Toggle ligature"
+                onclick="toggleLig()"
             />
-            <input type="button" value="print" onclick="pdfprint()" />
+            <input type="button" value="Vector generate" onclick="pdfprint()" />
         </div>
         <div id="viewer">
             <div style="position: absolute; visibility: hidden">
@@ -142,7 +174,7 @@
                     lIveD aRTiFacts FROM THE age Of COLLApSe
                 </p>
             </div>
-            <div>
+            <div class="lig">
                 <p>
                     HOmOtgLUS B ORChId MANtIs THIS SCulptURaL STUDy oF the
                     lIFefOrm KnowN aS coLlOQUIaLLY AS THe ORCHId MANTIs ExhiBiTs
