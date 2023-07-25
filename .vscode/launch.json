@@ -6,13 +6,18 @@
     "configurations": [
         {
             "type": "extendscript-debug",
-            "request": "attach",
-            "name": "Attach to ExtendScript Engine"
+            "request": "launch",
+            "name": "Launch in Illustrator 2023",
+            "hostAppSpecifier": "illustrator-27.064"
+            //"debugLevel": 3
         },
         {
             "type": "extendscript-debug",
             "request": "launch",
-            "name": "Launch Script in ExtendScript Engine"
+            "name": "Launch in Indesign 2021",
+            "hostAppSpecifier": "indesign-16.064",
+            "engineName": "main"
+            //"debugLevel": 3
         }
     ]
 }
