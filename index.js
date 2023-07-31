@@ -48,8 +48,13 @@ const stylecopy = (width) => `
         background-color: black;
     }
 
+    body > div {
+        width: ${width}px;
+        padding-right: 1px;
+    }
+
     p {
-        width: ${width};
+        width: 100%;
     }
 
     span {
