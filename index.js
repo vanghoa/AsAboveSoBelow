@@ -9,7 +9,6 @@ const viewer = $('#viewer');
 const leading = $('#leading');
 const lig_h = $('#lig_h');
 const lig_h_cap = $('#lig_h_cap');
-const lig_h_extra = $('#lig_h_extra');
 let resizecheck = true;
 //let pnode = px.firstChild;
 let timeout = null;
@@ -329,7 +328,7 @@ lig_h_cap.oninput = (e) => {
         setprop('--lig_cap', vl);
     }
 };
-lig_h_extra.oninput = (e) => {
+$('#lig_h_extra').oninput = (e) => {
     let vl = +e.target.value;
     if (!isNaN(vl) && e.target.value != '') {
         setprop('--lig_extra', vl);
@@ -387,7 +386,7 @@ async function calculateLigature() {
 
         render_arr_create();
 
-        //console.log(textconsole);
+        console.log(textconsole);
 
         render_arr_arr.push(render_arr);
         up_arr_prev = up_arr_tong[up_arr_tong.length - 1];
