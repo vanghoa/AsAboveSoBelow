@@ -9,6 +9,7 @@ const viewer = $('#viewer');
 const leading = $('#leading');
 const lig_h = $('#lig_h');
 const lig_h_cap = $('#lig_h_cap');
+const lig_h_extra = $('#lig_h_extra');
 let resizecheck = true;
 //let pnode = px.firstChild;
 let timeout = null;
@@ -26,13 +27,17 @@ const stylecopy = (width) => `
 
     :root {
         --unit: ${unit}px;
+        --lh: ${getprop('--lh')};
+        --lig: ${getprop('--lig')};
+        --lig_cap: ${getprop('--lig_cap')};
+        --lig_extra: ${getprop('--lig_extra')};
     }
 
     * {
         box-sizing: border-box;
         font-family: asabovesobelow;
         font-size: 20px;
-        line-height: calc(${getprop('--lh')} * 3.64em);
+        line-height: calc(var(--lh) * 3.64em);
         margin: 0;
         padding: 0;
         font-variation-settings: 'wght' 0;
@@ -55,11 +60,21 @@ const stylecopy = (width) => `
     }
 
     .lig span.alt {
-        font-variation-settings: 'wght' ${getprop('--lig')};
+        font-variation-settings: 'wght' var(--lig);
     }
 
     .lig span.altshort {
-        font-variation-settings: 'wght' ${getprop('--lig_cap')};
+        font-variation-settings: 'wght' var(--lig_cap);
+    }
+
+    .lig span.alt.letter_t {
+        font-variation-settings: 'wght'
+            calc(var(--lig) + var(--lig_extra));
+    }
+
+    .lig span.altshort.letter_t {
+        font-variation-settings: 'wght'
+            calc(var(--lig_cap) + var(--lig_extra));
     }
 
     p:first-child:first-line,
@@ -314,6 +329,12 @@ lig_h_cap.oninput = (e) => {
         setprop('--lig_cap', vl);
     }
 };
+lig_h_extra.oninput = (e) => {
+    let vl = +e.target.value;
+    if (!isNaN(vl) && e.target.value != '') {
+        setprop('--lig_extra', vl);
+    }
+};
 
 function readyToExecute() {
     if (++ready == 2) {
@@ -436,6 +457,9 @@ async function calculateLigature() {
                     let span = $create('span');
                     span.append(string);
                     span.wght = 'alt';
+                    if (string == 't') {
+                        span.classList.add('letter_t');
+                    }
                     span.style.marginLeft = `calc(${kern} * var(--unit))`;
                     span.style.marginRight = `calc(${kernr} * var(--unit))`;
                     if (char.st_down) {
@@ -570,6 +594,7 @@ async function calculateLigature() {
                     baretxt += render_arr_arr[x][i][k];
                 } else {
                     if (baretxt == '') {
+                        render_arr_arr[x][i][k].style.marginLeft = '0';
                         p_.append(render_arr_arr[x][i][k]);
                     } else {
                         p_.append(baretxt, render_arr_arr[x][i][k]);

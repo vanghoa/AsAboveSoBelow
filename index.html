@@ -11,6 +11,7 @@
                 --lh: 1;
                 --lig: 100;
                 --lig_cap: 90;
+                --lig_extra: 7;
             }
 
             @font-face {
@@ -56,6 +57,16 @@
 
             .lig span.altshort {
                 font-variation-settings: 'wght' var(--lig_cap);
+            }
+
+            .lig span.alt.letter_t {
+                font-variation-settings: 'wght'
+                    calc(var(--lig) + var(--lig_extra));
+            }
+
+            .lig span.altshort.letter_t {
+                font-variation-settings: 'wght'
+                    calc(var(--lig_cap) + var(--lig_extra));
             }
 
             p {
@@ -148,6 +159,10 @@
             <div>
                 Ligature height for caps (90 is standard)
                 <input type="text" value="90" id="lig_h_cap" />
+            </div>
+            <div>
+                Additional ligature height for t (7 is standard)
+                <input type="text" value="7" id="lig_h_extra" />
             </div>
             <input
                 type="button"
