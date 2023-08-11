@@ -7,8 +7,6 @@ const divx = $('#viewer div');
 const div = $$('#viewer div')[1];
 const viewer = $('#viewer');
 const leading = $('#leading');
-const lig_h = $('#lig_h');
-const lig_h_cap = $('#lig_h_cap');
 let resizecheck = true;
 //let pnode = px.firstChild;
 let timeout = null;
@@ -30,6 +28,7 @@ const stylecopy = (width) => `
         --lig: ${getprop('--lig')};
         --lig_cap: ${getprop('--lig_cap')};
         --lig_extra: ${getprop('--lig_extra')};
+        --lig_des: ${getprop('--lig_des')};
     }
 
     * {
@@ -69,6 +68,10 @@ const stylecopy = (width) => `
 
     .lig span.altshort {
         font-variation-settings: 'wght' var(--lig_cap);
+    }
+
+    .lig span.alt.des {
+        font-variation-settings: 'wght' var(--lig_des);
     }
 
     .lig span.alt.letter_t {
@@ -317,26 +320,45 @@ buffer.then((data) => {
 window.addEventListener('load', readyToExecute);
 leading.oninput = (e) => {
     let vl = +e.target.value;
-    if (!isNaN(vl) && e.target.value != '') {
-        setprop('--lh', vl);
+    let leading = lh(vl);
+    setprop('--lh', leading);
+    setprop('--lig', vl);
+    setprop('--lig_cap', ligcap(leading));
+    setprop('--lig_des', ligdes(leading));
+    function lh(x) {
+        return (
+            0.3 + ((Math.min(88, Math.max(x, 8)) - 8) / (88 - 8)) * (1 - 0.3)
+        );
     }
-};
-lig_h.oninput = (e) => {
-    let vl = +e.target.value;
-    if (!isNaN(vl) && e.target.value != '') {
-        setprop('--lig', vl);
+    function ligdes(input) {
+        if (input <= 0.3) {
+            return 0;
+        }
+        const [v, o] = [
+            [0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
+            [1, 14, 27, 41, 55, 68, 82, 97],
+        ];
+        const c = Math.max(v[0], Math.min(input, v[v.length - 1]));
+        const i = v.findIndex((val) => val >= c);
+        return i === -1
+            ? o[o.length - 1]
+            : o[i - 1] +
+                  ((c - v[i - 1]) / (v[i] - v[i - 1])) * (o[i] - o[i - 1]);
     }
-};
-lig_h_cap.oninput = (e) => {
-    let vl = +e.target.value;
-    if (!isNaN(vl) && e.target.value != '') {
-        setprop('--lig_cap', vl);
-    }
-};
-$('#lig_h_extra').oninput = (e) => {
-    let vl = +e.target.value;
-    if (!isNaN(vl) && e.target.value != '') {
-        setprop('--lig_extra', vl);
+    function ligcap(input) {
+        if (input <= 0.3) {
+            return 0;
+        }
+        const [v, o] = [
+            [0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
+            [2, 13, 24, 35, 47, 57, 69, 80],
+        ];
+        const c = Math.max(v[0], Math.min(input, v[v.length - 1]));
+        const i = v.findIndex((val) => val >= c);
+        return i === -1
+            ? o[o.length - 1]
+            : o[i - 1] +
+                  ((c - v[i - 1]) / (v[i] - v[i - 1])) * (o[i] - o[i - 1]);
     }
 };
 
@@ -391,7 +413,7 @@ async function calculateLigature() {
 
         render_arr_create();
 
-        console.log(textconsole);
+        //console.log(textconsole);
 
         render_arr_arr.push(render_arr);
         up_arr_prev = up_arr_tong[up_arr_tong.length - 1];
@@ -468,6 +490,7 @@ async function calculateLigature() {
                     span.style.marginRight = `calc(${kernr} * var(--unit))`;
                     if (char.st_down) {
                         let tempvl = tong + char.vl_down - 1;
+                        span.classList.add('des');
                         down_arr_span.push({
                             tempvl,
                             count: spancount,
@@ -616,6 +639,10 @@ async function calculateLigature() {
     // animation
     await wait(100);
     let allspan = viewer.querySelectorAll('span');
+    allspan[0].ontransitionend = (event) => {
+        viewer.classList.remove('anim');
+        allspan[0].ontransitionend = null;
+    };
     for (let i = 0; i < allspan.length; i++) {
         allspan[i].classList.add(allspan[i].wght);
     }
@@ -656,15 +683,33 @@ async function setText() {
 }
 
 function toggleLig() {
+    let span = viewer.querySelector('span');
+    if (span) {
+        viewer.classList.add('anim');
+        span.ontransitionend = () => {
+            viewer.classList.remove('anim');
+            span.ontransitionend = null;
+        };
+    }
     div.classList.toggle('lig');
 }
 
 //window.onresize = delay_calculateLigature;
-const resizeObserver = new ResizeObserver(delay_calculateLigature);
+let prevWidth = 0;
+const resizeObserver = new ResizeObserver((entries) => {
+    for (const entry of entries) {
+        const width = entry.borderBoxSize?.[0].inlineSize;
+        if (typeof width === 'number' && width !== prevWidth) {
+            prevWidth = width;
+            delay_calculateLigature();
+        }
+    }
+});
 
 let checkrs = true;
 function delay_calculateLigature() {
     if (checkrs) {
+        viewer.classList.add('anim');
         let spanani =
             div.querySelector('span.alt') || div.querySelector('span.altshort');
         if (spanani) {

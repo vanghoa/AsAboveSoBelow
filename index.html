@@ -7,16 +7,17 @@
         <style>
             :root {
                 --unit: 0px;
-                --fonturl: 'AsAbove,SoBelow(Beta45)VF.ttf';
+                --fonturl: 'AsAbove,SoBelow(Beta47)VF.ttf';
                 --lh: 1;
-                --lig: 100;
-                --lig_cap: 90;
-                --lig_extra: 7;
+                --lig: 88;
+                --lig_cap: 79;
+                --lig_extra: 9;
+                --lig_des: 96;
             }
 
             @font-face {
                 font-family: 'asabovesobelow';
-                src: url('AsAbove,SoBelow(Beta45)VF.ttf');
+                src: url('AsAbove,SoBelow(Beta47)VF.ttf');
             }
 
             * {
@@ -46,9 +47,12 @@
             }
 
             span {
-                transition: font-variation-settings 0.5s;
                 font-variation-settings: 'wght' 0;
                 font-kerning: none;
+            }
+
+            .anim span {
+                transition: font-variation-settings 0.5s;
             }
 
             .lig span.alt {
@@ -57,6 +61,10 @@
 
             .lig span.altshort {
                 font-variation-settings: 'wght' var(--lig_cap);
+            }
+
+            .lig span.alt.des {
+                font-variation-settings: 'wght' var(--lig_des);
             }
 
             .lig span.alt.letter_t {
@@ -149,21 +157,15 @@
             ></textarea>
             <input type="button" value="Sample text" onclick="setText()" />
             <div>
-                Line height: <br />
-                (1 is standard)
-                <input type="text" value="1" id="leading" />
-            </div>
-            <div>
-                Ligature height (100 is standard)
-                <input type="text" value="100" id="lig_h" />
-            </div>
-            <div>
-                Ligature height for caps (90 is standard)
-                <input type="text" value="90" id="lig_h_cap" />
-            </div>
-            <div>
-                Additional ligature height for t (7 is standard)
-                <input type="text" value="7" id="lig_h_extra" />
+                Leading
+                <input
+                    type="range"
+                    min="8"
+                    max="88"
+                    value="88"
+                    id="leading"
+                    style="padding: 0; margin: 0"
+                />
             </div>
             <input
                 type="button"
@@ -172,7 +174,7 @@
             />
             <input type="button" value="Vector generate" onclick="pdfprint()" />
         </div>
-        <div id="viewer">
+        <div id="viewer" class="anim">
             <div style="position: absolute; visibility: hidden">
                 <p>
                     HOmOtgLUS B ORChId MANtIs THIS SCulptURaL STUDy oF the
