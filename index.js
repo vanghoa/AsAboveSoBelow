@@ -639,6 +639,7 @@ async function calculateLigature() {
     // animation
     await wait(100);
     let allspan = viewer.querySelectorAll('span');
+    viewer.classList.add('anim');
     allspan[0].ontransitionend = (event) => {
         viewer.classList.remove('anim');
         allspan[0].ontransitionend = null;
