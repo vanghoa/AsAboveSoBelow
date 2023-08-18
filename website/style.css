@@ -16,6 +16,7 @@ html,
 body {
     font-size: 25px;
     background-color: var(--purple);
+    overflow: hidden;
 }
 
 * {
@@ -75,10 +76,6 @@ nav #nav_handle {
     z-index: 100;
 }
 
-nav #logo1 {
-    font-variation-settings: 'wght' 200;
-}
-
 nav .logo {
     word-break: break-all;
     line-height: 0.6em;
@@ -112,12 +109,10 @@ nav :is(.sublink, #logo2) span {
     font-variation-settings: 'wght' 0;
 }
 
-nav.anim :is(.sublink, #logo2) span {
-    font-variation-settings: 'wght' 100;
-}
-
+nav.anim :is(.sublink, #logo2) span,
 nav.small #logo2 span,
-nav.small #logo2 {
+nav.small #logo2,
+nav #logo1 {
     font-variation-settings: 'wght' 100;
 }
 
