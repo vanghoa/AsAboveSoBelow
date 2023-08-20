@@ -18,17 +18,20 @@ const nav_logo = $$('.logo');
 const nav_handle_size = parseInt(getprop('--nav_handle_size'));
 const nav_sublinks = $$('.sublink');
 const nav_trans = $('#ontransitionend');
-nav_trans.ontransitionend = () => {
+nav_trans.ontransitionend = async function () {
     nav.classList.add('anim');
+    await wait(500);
+    nav.classList.toggle('help');
 };
 const fonturl = getprop('--fonturl').slice(1, -1);
-let nav_anim_arr = [];
+//let nav_anim_arr = [];
 let font, posarr, nav_left;
 let nav_fontsz = parseFloat(getComputedStyle(nav).fontSize);
-let nav_padding = parseFloat(
-    getComputedStyle(nav).getPropertyValue('--nav_padding')
-);
+let nav_padding =
+    parseFloat(getComputedStyle(nav).getPropertyValue('--nav_padding')) *
+    nav_fontsz;
 let nav_unit = nav_fontsz / (20 / 1.4);
+let nav_tongtrans = [0, 0];
 const debounce = {
     first: true,
     timeout: null,
@@ -36,6 +39,7 @@ const debounce = {
         let this_ = this;
         if (this.first) {
             nav.classList.remove('anim', 'small');
+            posarr[5].elem.classList.remove('dropdown');
             this.first = false;
         }
 
@@ -45,14 +49,24 @@ const debounce = {
         this.timeout = setTimeout(function () {
             this_.timeout = null;
             this_.first = true;
-            if (nav_left == 0) {
+            if (
+                nav_trans.getBoundingClientRect().width <
+                0.6 * nav_fontsz + nav_padding * 2
+            ) {
                 nav_resize_small();
             } else {
+                nav.classList[
+                    nav_trans.getBoundingClientRect().width <
+                    12.3 * nav_fontsz + nav_padding * 2
+                        ? 'add'
+                        : 'remove'
+                ]('medium');
                 nav_resize_handle();
             }
-        }, 900);
+        }, 300);
     },
 };
+// resizeobserver
 let prevWidth = 0;
 const resizeObserver = new ResizeObserver((entries) => {
     for (const entry of entries) {
@@ -64,6 +78,7 @@ const resizeObserver = new ResizeObserver((entries) => {
     }
 });
 
+// data
 const list = new (function () {
     this._construct = function (
         letter,
@@ -319,7 +334,24 @@ fetch(`${window.location.pathname.replace('index.html', '')}${fonturl}`)
         });
 }
 
+onresize = () => {
+    nav_fontsz = parseFloat(getComputedStyle(nav).fontSize);
+    nav_padding =
+        parseFloat(getComputedStyle(nav).getPropertyValue('--nav_padding')) *
+        nav_fontsz;
+    nav_unit = nav_fontsz / (20 / 1.4);
+};
+
 function readyToExecute_nav() {
+    let span2_;
+    let checkfirst = 0;
+    let modelarr = [
+        'A: Adversaries',
+        'B:  Orchid Mantis',
+        'C: Marrow Codex',
+        'D: 黑科技',
+        'E: Nomad Lexis ',
+    ];
     posarr = [nav_logo[1], ...nav_sublinks].map(calcData);
     console.log(posarr);
     function calcData(elem) {
@@ -339,6 +371,8 @@ function readyToExecute_nav() {
             },
             elem,
             text,
+            ascspan: [],
+            desspan: [],
             ln: {
                 out: {
                     asc: [],
@@ -354,13 +388,59 @@ function readyToExecute_nav() {
 
         if (ln.length > 1) {
             let tong1 = calc(ln[0], true, false, 'ln');
-            let tong2 = calc(ln[1], false, true, 'ln', ln[0].length + 1);
-            obj.ln.tong = tong1 > tong2 ? tong1 : tong2;
+            let tong2 = calc(ln[1], false, true, 'ln', tong1[1])[0];
+            obj.ln.tong = tong1[0] > tong2 ? tong1[0] : tong2;
         }
-        obj.nln.tong = calc(text, true, true, 'nln');
+        //
+        let baretxt = '';
+        let span1 = $create('span');
+        if (checkfirst == 0) {
+            let spang = $create('span');
+            spang.classList.add('mark');
+            spang.innerHTML = 'g';
+            let spany = $create('span');
+            spany.classList.add('mark', 'y');
+            spany.innerHTML = 'y';
+            span1.append(
+                'a',
+                spang,
+                'enc',
+                spany,
+                $create('br'),
+                $create('br')
+            );
+        } else {
+            span1.innerHTML = text[0];
+        }
+        let span2 = $create('span');
+        obj.nln.tong = calc(text, true, true, 'nln')[0]; //
+        span2.append(baretxt);
+        elem.innerHTML = '';
+        elem.append(span1, span2);
+        if (checkfirst == 5) {
+            span2_ = span2;
+            span2.onclick = modeldrop;
+            let modelspan = Array.from(modelarr, (x) => {
+                let a = $create('a');
+                let span_ = $create('span');
+                span_.innerHTML = `model ${x[0]}`;
+                let span__ = $create('span');
+                span__.innerHTML = x.substring(1);
+                a.append(span_, span__);
+                a.classList.add('model');
+                return a;
+            });
+            elem.append(...modelspan);
+        }
+        //
+        checkfirst++;
         return obj;
-        function calc(text, firstline, secondline, prefix, secondextra = 0) {
+        //
+        function calc(text, firstline, secondline, prefix, extra = [0, 0]) {
+            let render = firstline && secondline;
             let tong = 0;
+            //
+            let [asc_count, des_count] = extra;
             for (let k = 0; k < text.length; k++) {
                 let kern = 0;
                 let string = text[k];
@@ -376,7 +456,10 @@ function readyToExecute_nav() {
                 tong += kern;
                 if (firstline) {
                     if (char.st_up) {
-                        obj[prefix].out.asc.push([tong + char.vl_up - 1, k]);
+                        obj[prefix].out.asc.push([
+                            tong + char.vl_up - 1,
+                            asc_count,
+                        ]);
                     }
                     for (let i = 0; i < char.ps_down.length; i++) {
                         obj[prefix].in.des.push(tong + char.ps_down[i] - 1);
@@ -386,29 +469,70 @@ function readyToExecute_nav() {
                     if (char.st_down) {
                         obj[prefix].out.des.push([
                             tong + char.vl_down - 1,
-                            k + secondextra,
+                            des_count,
                         ]);
                     }
                     for (let i = 0; i < char.ps_up.length; i++) {
                         obj[prefix].in.asc.push(tong + char.ps_up[i] - 1);
                     }
                 }
+                if (render) {
+                    if (char.st_up) {
+                        obj.ascspan.push(render_('asc'));
+                    } else if (char.st_down) {
+                        obj.desspan.push(render_('des'));
+                    } else {
+                        baretxt += string;
+                    }
+                    function render_(class_) {
+                        let kernl = 0,
+                            kernr = 0;
+                        if (k > 0) {
+                            kernl =
+                                font.getKerningValue(
+                                    font.charToGlyph(text[k - 1]),
+                                    font.charToGlyph(text[k])
+                                ) / 70;
+                        }
+                        if (k < text.length - 1) {
+                            kernr =
+                                font.getKerningValue(
+                                    font.charToGlyph(text[k]),
+                                    font.charToGlyph(text[k + 1])
+                                ) / 70;
+                        }
+                        let span = $create('span');
+                        span.innerHTML = text[k];
+                        span.style.marginLeft = `calc(${kernl} * var(--nav_unit))`;
+                        span.style.marginRight = `calc(${kernr} * var(--nav_unit))`;
+                        span.classList.add(class_, 'mark');
+                        span2.append(baretxt, span);
+                        baretxt = '';
+                        return span;
+                    }
+                }
                 tong += char.width;
+                asc_count += char.st_up ? 1 : 0;
+                des_count += char.st_down ? 1 : 0;
             }
-            return tong;
+            return [tong, [asc_count, des_count]];
         }
     }
-    nav_resize_handle();
+    //nav_resize_handle();
     resizeObserver.observe(nav);
 }
 
 function nav_resize_handle() {
-    for (let i = 0; i < posarr.length; i++) {
-        posarr[i].elem.innerHTML = posarr[i].text;
-    }
     let tongtrans = 0;
-    nav_anim_arr = [];
     let navw = Math.floor(nav_trans.getBoundingClientRect().width / nav_unit);
+    for (let i = 0; i < posarr.length; i++) {
+        posarr[i].desspan.forEach((elem) => {
+            elem.classList.remove('alt');
+        });
+        posarr[i].ascspan.forEach((elem) => {
+            elem.classList.remove('alt');
+        });
+    }
     for (let i = 1; i < posarr.length; i++) {
         calcPos(i);
     }
@@ -417,55 +541,54 @@ function nav_resize_handle() {
     async function calcPos(index) {
         let prefix = {
             last:
-                posarr[index - 1].elem.clientHeight > nav_fontsz ? 'ln' : 'nln',
-            curr: posarr[index].elem.clientHeight > nav_fontsz ? 'ln' : 'nln',
+                posarr[index - 1].elem.children[1].clientHeight > nav_fontsz + 2
+                    ? 'ln'
+                    : 'nln',
+            curr:
+                posarr[index].elem.children[1].clientHeight > nav_fontsz + 2
+                    ? 'ln'
+                    : 'nln',
         };
+        let objcurrw = posarr[index][prefix.curr].tong;
+        //
         let objlast = posarr[index - 1][prefix.last].out.des;
         let objcurr = posarr[index][prefix.curr].in.des;
-        let objcurrw = posarr[index][prefix.curr].tong;
-        let [indes, outdes] = outindes();
-        let translateby = outdes[0] + tongtrans - indes;
+        let objlast_as = posarr[index - 1][prefix.last].in.asc;
+        let objcurr_as = posarr[index][prefix.curr].out.asc;
+        //
+        let ascORdes = objcurr_as.length > 0 && Math.random() > 0.5;
+        let inasc, outasc, indes, outdes, ascpass;
+        if (ascORdes) {
+            [ascpass, inasc, outasc] = outinasc_(
+                objlast_as,
+                objcurr_as,
+                navw,
+                objcurrw,
+                tongtrans
+            );
+            if (!ascpass) {
+                [indes, outdes] = outindes();
+                ascORdes = false;
+            }
+        } else {
+            [indes, outdes] = outindes();
+        }
+        //
+        let translateby =
+            (ascORdes ? inasc - outasc[0] : outdes[0] - indes) + tongtrans;
+        //let translateby = outdes[0] + tongtrans - indes;
         posarr[
             index
         ].elem.style.left = `calc(${translateby} * var(--nav_unit))`;
+        if (index == 5) {
+            nav_tongtrans = tongtrans;
+        }
         tongtrans = translateby;
         // render
-        {
-            let elemlast = posarr[index - 1].elem;
-            let elemlast_text = posarr[index - 1].text;
-            elemlast.innerHTML = '';
-            let firsthalf =
-                outdes[1] == 0 ? '' : elemlast_text.substring(0, outdes[1]);
-            let secondhalf =
-                outdes[1] == elemlast_text.length - 1
-                    ? ''
-                    : elemlast_text.substring(
-                          outdes[1] + 1,
-                          elemlast_text.length
-                      );
-            let i = outdes[1];
-            let kernl = 0,
-                kernr = 0;
-            if (i > 0) {
-                kernl =
-                    font.getKerningValue(
-                        font.charToGlyph(elemlast_text[i - 1]),
-                        font.charToGlyph(elemlast_text[i])
-                    ) / 70;
-            }
-            if (i < elemlast_text.length - 1) {
-                kernr =
-                    font.getKerningValue(
-                        font.charToGlyph(elemlast_text[i]),
-                        font.charToGlyph(elemlast_text[i + 1])
-                    ) / 70;
-            }
-            let span = $create('span');
-            span.innerHTML = elemlast_text[i];
-            span.style.marginLeft = `calc(${kernl} * var(--nav_unit))`;
-            span.style.marginRight = `calc(${kernr} * var(--nav_unit))`;
-            nav_anim_arr.push(span);
-            elemlast.append(firsthalf, span, secondhalf);
+        if (ascORdes) {
+            posarr[index]['ascspan'][outasc[1]].classList.add('alt');
+        } else {
+            posarr[index - 1]['desspan'][outdes[1]].classList.add('alt');
         }
 
         function outindes() {
@@ -478,10 +601,6 @@ function nav_resize_handle() {
                 for (let i = 0; i < objcurr.length; i++) {
                     if (objcurr[i] <= objlast[outdes_i][0] + tongtrans) {
                         index_end = i;
-                        /*
-                        if (objcurr[i] + tongtrans < 0.4 * navw) {
-                            break;
-                        }*/
                     } else {
                         break;
                     }
@@ -530,10 +649,119 @@ function nav_resize_handle() {
 
 function nav_resize_small() {
     nav.classList.add('small');
-    posarr[0].elem.append($create('br'), $create('br'));
     for (let i = 1; i < posarr.length; i++) {
-        posarr[i].elem.innerHTML = posarr[i].text[0];
+        posarr[i].elem.style.left = '';
     }
+}
+
+function outinasc_(
+    objlast_as,
+    objcurr_as,
+    navw,
+    objcurrw,
+    tongtrans,
+    ascchk = true
+) {
+    let index_end = null,
+        index_start = null,
+        outas_i = objcurr_as.length - 1,
+        pass = true;
+    //start
+    while (pass) {
+        for (let i = objlast_as.length - 1; i >= 0; i--) {
+            if (objlast_as[i] + tongtrans >= objcurr_as[outas_i][0]) {
+                index_end = i;
+            } else {
+                break;
+            }
+        }
+
+        if (index_end == null) {
+            if (outas_i > 0) {
+                outas_i--;
+            } else {
+                index_end = objlast_as.length - 1;
+                pass = false;
+                if (ascchk) {
+                    return [false, 0, 0];
+                }
+            }
+        } else if (
+            outas_i > 0 &&
+            objlast_as[0] + tongtrans >= objcurr_as[outas_i - 1][0] &&
+            objlast_as[0] + tongtrans - objcurr_as[outas_i - 1][0] <=
+                navw - objcurrw - 40
+        ) {
+            outas_i--;
+        } else {
+            pass = false;
+        }
+    }
+    //end
+    for (let i = index_end; i < objlast_as.length; i++) {
+        if (
+            objlast_as[i] + tongtrans - objcurr_as[outas_i][0] <=
+            navw - objcurrw - 40
+        ) {
+            index_start = i;
+        } else {
+            break;
+        }
+    }
+    if (index_start == null) {
+        index_start = index_end;
+        if (ascchk) {
+            return [false, 0, 0];
+        }
+    }
+    //return
+    return [
+        true,
+        objlast_as[getRandomInteger(index_end, index_start)],
+        objcurr_as[outas_i],
+    ];
+}
+
+async function modeldrop() {
+    let span2 = this.parentElement;
+    if (!span2.classList.contains('dropdown')) {
+        for (let i = posarr.length - 2; i < posarr.length; i++) {
+            posarr[i].desspan.forEach((elem) => {
+                elem.classList.remove('alt');
+            });
+            posarr[i].ascspan.forEach((elem) => {
+                elem.classList.remove('alt');
+            });
+        }
+        let prefix =
+            posarr[4].elem.children[1].clientHeight > nav_fontsz + 2
+                ? 'ln'
+                : 'nln';
+        let objlast_as = posarr[4][prefix].in.asc;
+        let objcurr_as = posarr[5].nln.out.asc;
+        let [ascpass, inasc, outasc] = outinasc_(
+            objlast_as,
+            objcurr_as,
+            Math.floor(nav_trans.getBoundingClientRect().width / nav_unit),
+            posarr[5].nln.tong + 123,
+            nav_tongtrans,
+            false
+        );
+        let translateby = inasc - outasc[0] + nav_tongtrans;
+        posarr[5].elem.style.left = `calc(${translateby} * var(--nav_unit))`;
+        posarr[5]['ascspan'][outasc[1]].classList.add('alt');
+        //
+        span2.classList.add('show');
+        await wait(50);
+        span2.classList.add('dropdown');
+    } else {
+        span2.classList.remove('dropdown');
+        await wait(1050);
+        span2.classList.remove('show');
+    }
+    await wait(500);
+    nav.classList.toggle('help');
+    //
 }
 
 function wait(delay) {

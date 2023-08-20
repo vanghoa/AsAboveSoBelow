@@ -1,5 +1,5 @@
 :root {
-    --nav_left_max: 100vw;
+    --nav_left_max: 375px;
     --nav_top: 50vh;
     --nav_handle_size: 25px;
     --fonturl: 'AsAbove,SoBelow(Beta47)VF.ttf';
@@ -34,21 +34,39 @@ main {
     height: 100vh;
     position: relative;
     overflow: hidden;
+    display: flex;
 }
 nav {
-    font-size: 1rem; /* control */
-    --nav_padding: 20px;
+    font-size: 25px; /* control */
+    --nav_padding: 0.8em;
     --nav_left: min(
         calc(100vw - var(--nav_handle_size)),
-        max(var(--nav_left_max), calc(0.4em + var(--nav_padding) * 2))
+        max(var(--nav_left_max), calc(0.3em + var(--nav_padding) * 2))
     );
     --nav_unit: calc(1em / (20 / 1.4));
     width: calc(var(--nav_left) + var(--nav_handle_size) / 2);
-    padding: var(--nav_padding);
-    padding-top: calc(var(--nav_padding) + 2.8em);
     height: 100%;
     background-color: var(--white);
+    overflow: visible;
+    position: relative;
+    transition: width 0.2s;
+}
+
+nav.help {
+    border: 0px solid transparent;
+}
+
+nav #overflow {
+    padding: var(--nav_padding);
+    padding-top: calc(var(--nav_padding) + 2.8em);
+    width: 100%;
+    height: 100%;
     overflow: hidden;
+}
+
+nav #overflow > * {
+    z-index: 1;
+    position: relative;
 }
 
 nav a {
@@ -57,9 +75,10 @@ nav a {
     width: fit-content;
 }
 
-nav :is(.sublink, #logo2):hover,
-#logo1:hover ~ #logo2 {
+nav :is(.sublink, #logo2) > *:hover,
+#logo1:hover ~ #logo2 > * {
     text-decoration: underline;
+    text-decoration-color: var(--purple);
 }
 
 nav #nav_handle {
@@ -74,6 +93,7 @@ nav #nav_handle {
     left: var(--nav_left);
     top: min(calc(100vh - var(--nav_handle_size)), var(--nav_top));
     z-index: 100;
+    transition: left 0.2s;
 }
 
 nav .logo {
@@ -103,13 +123,77 @@ nav .sublink {
     transition: left 0.5s;
 }
 
-nav :is(.sublink, #logo2) span {
+nav .sublink > * {
+    cursor: pointer;
+    position: relative;
+    z-index: 2;
+}
+
+nav :is(.sublink, #logo2) span.mark {
     font-kerning: none;
     transition: font-variation-settings 0.2s;
     font-variation-settings: 'wght' 0;
 }
 
-nav.anim :is(.sublink, #logo2) span,
+nav :is(.sublink, #logo2) > span:first-child,
+nav.small :is(.sublink, #logo2) > :nth-child(n + 2) {
+    display: none;
+}
+
+nav :is(.sublink, #logo2) > span:nth-child(2),
+nav.small :is(.sublink, #logo2) > span:first-child {
+    display: inline-block;
+}
+/**/
+nav .sublink > .model:nth-child(n + 3) {
+    display: block;
+    position: relative;
+    visibility: hidden;
+    margin-top: 0em;
+    line-height: 0em;
+    word-break: break-all;
+    width: calc(var(--nav_unit) * 43);
+    transition: line-height 1s, margin-top 1s, width 1s;
+    z-index: 1;
+    color: transparent;
+}
+
+nav .sublink > .model:nth-child(n + 3) > span {
+    color: inherit;
+}
+
+nav .sublink > .model:nth-child(n + 3)::first-line {
+    color: var(--purple);
+}
+
+nav .sublink > .model:nth-child(3) {
+    margin-top: -0.5em;
+}
+
+nav.medium .sublink > .model:nth-child(n + 3) > span:nth-child(2) {
+    display: none;
+}
+
+nav .sublink.show > .model:nth-child(n + 3) {
+    visibility: visible;
+}
+
+nav .sublink.dropdown > .model:nth-child(n + 3) {
+    margin-top: 1em;
+    line-height: 1em;
+    width: 100%;
+}
+
+nav .sublink > .model:nth-child(n + 3) > span:first-child {
+    font-variation-settings: 'wght' 0;
+    transition: font-variation-settings 1s;
+}
+
+nav .sublink.dropdown > .model:nth-child(n + 3) > span:first-child {
+    font-variation-settings: 'wght' 37;
+}
+/**/
+nav.anim :is(.sublink, #logo2) span.mark.alt,
 nav.small #logo2 span,
 nav.small #logo2,
 nav #logo1 {
@@ -120,12 +204,48 @@ nav.small .sublink {
     left: 0 !important;
 }
 
-nav.small #logo2:hover,
-nav.small #logo1:hover ~ #logo2 {
+nav.small #logo2:hover > *,
+nav.small #logo1:hover ~ #logo2 > * {
     text-decoration: none;
 }
 
-nav.small #logo2:hover span,
-nav.small #logo1:hover ~ #logo2 span {
+nav.small #logo2:hover .mark.y,
+nav.small #logo1:hover ~ #logo2 .mark.y {
     text-decoration: underline;
+}
+
+nav.small #logo2 span.mark {
+    animation-name: logo2;
+    animation-duration: 0.5s;
+}
+
+@keyframes logo2 {
+    0% {
+        font-variation-settings: 'wght' 0;
+    }
+    100% {
+        font-variation-settings: 'wght' 100;
+    }
+}
+
+/* */
+section {
+    pointer-events: none;
+    left: 0;
+    top: 0;
+    flex: 1;
+    height: 100%;
+    overflow: hidden;
+    z-index: 0;
+    border: solid 2px var(--purple);
+}
+
+@media only screen and (max-width: 600px) {
+    :root {
+        --nav_left_max: 0px;
+    }
+
+    nav {
+        font-size: 16px; /* control */
+    }
 }
