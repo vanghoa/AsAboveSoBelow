@@ -18,6 +18,7 @@ const nav_logo = $$('.logo');
 const nav_handle_size = parseInt(getprop('--nav_handle_size'));
 const nav_sublinks = $$('.sublink');
 const nav_trans = $('#ontransitionend');
+const nav_numth = 5;
 nav_trans.ontransitionend = async function () {
     nav.classList.add('anim');
     await wait(500);
@@ -39,7 +40,7 @@ const debounce = {
         let this_ = this;
         if (this.first) {
             nav.classList.remove('anim', 'small');
-            posarr[5].elem.classList.remove('dropdown');
+            posarr[nav_numth + 1].elem.classList.remove('dropdown');
             this.first = false;
         }
 
@@ -222,6 +223,7 @@ fetch(`${window.location.pathname.replace('index.html', '')}${fonturl}`)
         list.lowercase('z', 49);
         // punctuation
         list.lowercase(' ', 49);
+        list.lowercase('&nbsp;', 49);
         list.lowercase('.', 28);
         list.lowercase(',', 21);
         list.lowercase(';', 28);
@@ -253,6 +255,7 @@ fetch(`${window.location.pathname.replace('index.html', '')}${fonturl}`)
         list.lowercase('<', 63);
         list.lowercase('~', 56);
         list.lowercase('^', 42);
+        list.lowercase('|', 35, [3], [3]);
         //cap
         list.cap('A', 63, [9], [5]);
         list.cap('B', 63, [2]);
@@ -417,7 +420,7 @@ function readyToExecute_nav() {
         span2.append(baretxt);
         elem.innerHTML = '';
         elem.append(span1, span2);
-        if (checkfirst == 5) {
+        if (checkfirst == nav_numth + 1) {
             span2_ = span2;
             span2.onclick = modeldrop;
             let modelspan = Array.from(modelarr, (x) => {
@@ -580,7 +583,7 @@ function nav_resize_handle() {
         posarr[
             index
         ].elem.style.left = `calc(${translateby} * var(--nav_unit))`;
-        if (index == 5) {
+        if (index == nav_numth + 1) {
             nav_tongtrans = tongtrans;
         }
         tongtrans = translateby;
@@ -734,22 +737,24 @@ async function modeldrop() {
             });
         }
         let prefix =
-            posarr[4].elem.children[1].clientHeight > nav_fontsz + 2
+            posarr[nav_numth].elem.children[1].clientHeight > nav_fontsz + 2
                 ? 'ln'
                 : 'nln';
-        let objlast_as = posarr[4][prefix].in.asc;
-        let objcurr_as = posarr[5].nln.out.asc;
+        let objlast_as = posarr[nav_numth][prefix].in.asc;
+        let objcurr_as = posarr[nav_numth + 1].nln.out.asc;
         let [ascpass, inasc, outasc] = outinasc_(
             objlast_as,
             objcurr_as,
             Math.floor(nav_trans.getBoundingClientRect().width / nav_unit),
-            posarr[5].nln.tong + 123,
+            posarr[nav_numth + 1].nln.tong + 123,
             nav_tongtrans,
             false
         );
         let translateby = inasc - outasc[0] + nav_tongtrans;
-        posarr[5].elem.style.left = `calc(${translateby} * var(--nav_unit))`;
-        posarr[5]['ascspan'][outasc[1]].classList.add('alt');
+        posarr[
+            nav_numth + 1
+        ].elem.style.left = `calc(${translateby} * var(--nav_unit))`;
+        posarr[nav_numth + 1]['ascspan'][outasc[1]].classList.add('alt');
         //
         span2.classList.add('show');
         await wait(50);

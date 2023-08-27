@@ -2,14 +2,14 @@
     --nav_left_max: 375px;
     --nav_top: 50vh;
     --nav_handle_size: 25px;
-    --fonturl: 'AsAbove,SoBelow(Beta47)VF.ttf';
+    --fonturl: 'AsAbove,SoBelow(Beta48)VF.ttf';
     --purple: #796e7a;
     --white: #e8efef;
 }
 
 @font-face {
     font-family: 'asabovesobelow';
-    src: url('AsAbove,SoBelow(Beta47)VF.ttf');
+    src: url('AsAbove,SoBelow(Beta48)VF.ttf');
 }
 
 html,

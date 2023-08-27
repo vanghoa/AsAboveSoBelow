@@ -267,6 +267,7 @@ buffer.then((data) => {
     list.lowercase('<', 63);
     list.lowercase('~', 56);
     list.lowercase('^', 42);
+    list.lowercase('|', 35, [3], [3]);
     //cap
     list.cap('A', 63, [9], [5]);
     list.cap('B', 63, [2]);
