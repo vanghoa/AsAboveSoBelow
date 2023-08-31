@@ -185,6 +185,7 @@ if (selection.length > 0) {
         list.lowercase('<', 63);
         list.lowercase('~', 56);
         list.lowercase('^', 42);
+        list.lowercase('|', 35, [3], [3]);
         //cap
         list.cap('A', 63, [9], [5]);
         list.cap('B', 63, [2]);
@@ -240,7 +241,7 @@ if (selection.length > 0) {
         //
     }
 
-    var font_fam = 'As Above, So Below (Beta44)';
+    var font_fam = 'As Above, So Below (Beta48)';
     var alt = app.fonts.itemByName(font_fam + '	Ligature Lower');
     var altshort = app.fonts.itemByName(font_fam + '	Ligature Upper');
     var regular = app.fonts.itemByName(font_fam + '	Neutral');
