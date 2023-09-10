@@ -350,10 +350,17 @@ function readyToExecute_nav() {
     let checkfirst = 0;
     let modelarr = [
         'A: Adversaries',
-        'B:  Orchid Mantis',
+        'B: Orchid Mantis',
         'C: Marrow Codex',
         'D: 黑科技',
         'E: Nomad Lexis ',
+    ];
+    let modelurl = [
+        'https://formandagency.vercel.app/modelA',
+        'https://formandagency.vercel.app/modelB',
+        'https://formandagency.vercel.app/modelC',
+        'https://formandagency.vercel.app/modelD',
+        'https://formandagency.vercel.app/modelE',
     ];
     posarr = [nav_logo[1], ...nav_sublinks].map(calcData);
     console.log(posarr);
@@ -423,8 +430,10 @@ function readyToExecute_nav() {
         if (checkfirst == nav_numth + 1) {
             span2_ = span2;
             span2.onclick = modeldrop;
-            let modelspan = Array.from(modelarr, (x) => {
+            let modelspan = Array.from(modelarr, (x, k) => {
                 let a = $create('a');
+                a.target = '_blank';
+                a.href = modelurl[k];
                 let span_ = $create('span');
                 span_.innerHTML = `model ${x[0]}`;
                 let span__ = $create('span');

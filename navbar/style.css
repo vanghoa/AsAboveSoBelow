@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300&display=swap');
+
 :root {
     --nav_left_max: 375px;
     --nav_top: 50vh;
@@ -21,7 +23,7 @@ body {
 
 * {
     box-sizing: border-box;
-    font-family: asabovesobelow;
+    font-family: asabovesobelow, 'Noto Serif TC';
     margin: 0;
     padding: 0;
     font-variation-settings: 'wght' 0;
