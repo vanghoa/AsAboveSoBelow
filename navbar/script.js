@@ -329,7 +329,7 @@ fetch(`${window.location.pathname.replace('index.html', '')}${fonturl}`)
         })
         .on('dragmove', function (event) {
             nav_left =
-                event.rect.left > 5.3 * nav_fontsz + nav_padding * 2
+                event.rect.left > 3.5 * nav_fontsz + nav_padding * 2
                     ? event.rect.left
                     : 0;
             setprop('--nav_left_max', `${nav_left}px`);
@@ -569,6 +569,9 @@ function nav_resize_handle() {
         let objcurr_as = posarr[index][prefix.curr].out.asc;
         //
         let ascORdes = objcurr_as.length > 0 && Math.random() > 0.5;
+        let ascForce = false;
+        ascORdes = objlast.length > 0 ? ascORdes : (ascForce = true);
+        //console.log(ascForce);
         let inasc, outasc, indes, outdes, ascpass;
         if (ascORdes) {
             [ascpass, inasc, outasc] = outinasc_(
@@ -576,7 +579,8 @@ function nav_resize_handle() {
                 objcurr_as,
                 navw,
                 objcurrw,
-                tongtrans
+                tongtrans,
+                !ascForce
             );
             if (!ascpass) {
                 [indes, outdes] = outindes();
@@ -741,9 +745,11 @@ async function modeldrop() {
             posarr[i].desspan.forEach((elem) => {
                 elem.classList.remove('alt');
             });
-            posarr[i].ascspan.forEach((elem) => {
-                elem.classList.remove('alt');
-            });
+            if (i == posarr.length - 1) {
+                posarr[i].ascspan.forEach((elem) => {
+                    elem.classList.remove('alt');
+                });
+            }
         }
         let prefix =
             posarr[nav_numth].elem.children[1].clientHeight > nav_fontsz + 2

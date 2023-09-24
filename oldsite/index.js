@@ -3,23 +3,18 @@
 // 'g,j,p,q,y';
 // binding method
 
-const divx = $_('#viewer div');
+const divx = $('#viewer div');
 const div = $$('#viewer div')[1];
-const viewer = $_('#viewer');
-const nav_handle = $_('#nav_handle');
-let fontsz = parseFloat(getComputedStyle(document.documentElement).fontSize);
-let leadingMaxRange = Math.ceil(innerHeight - fontsz * 4.8);
-let unit = fontsz / (20 / 1.4);
-onresize = () => {
-    fontsz = parseFloat(getComputedStyle(document.documentElement).fontSize);
-    leadingMaxRange = Math.ceil(innerHeight - fontsz * 4.8);
-    unit = fontsz / (20 / 1.4);
-};
+const viewer = $('#viewer');
+const leading = $('#leading');
+let resizecheck = true;
 //let pnode = px.firstChild;
 let timeout = null;
-let delaypromise = Promise.resolve(true);
 let ready = 0;
-setprop('--unit', `${unit.toFixed(3)}px`);
+let unit =
+    parseFloat(getComputedStyle(document.documentElement).fontSize) /
+    (20 / 1.4);
+setprop('--unit', `${unit}px`);
 const scrollbarwidth = getScrollbarWidth();
 const stylecopy = (width) => `
     @font-face {
@@ -28,7 +23,7 @@ const stylecopy = (width) => `
     }
 
     :root {
-        --unit: ${unit.toFixed(3)}px;
+        --unit: ${unit}px;
         --lh: ${getprop('--lh')};
         --lig: ${getprop('--lig')};
         --lig_cap: ${getprop('--lig_cap')};
@@ -324,58 +319,49 @@ buffer.then((data) => {
 });
 
 window.addEventListener('load', readyToExecute);
-
-let global = {
-    leading: 1,
-    vl: 88,
+leading.oninput = (e) => {
+    let vl = +e.target.value;
+    let leading = lh(vl);
+    setprop('--lh', leading);
+    setprop('--lig', vl);
+    setprop('--lig_cap', ligcap(leading));
+    setprop('--lig_des', ligdes(leading));
+    function lh(x) {
+        return (
+            0.3 + ((Math.min(88, Math.max(x, 8)) - 8) / (88 - 8)) * (1 - 0.3)
+        );
+    }
+    function ligdes(input) {
+        if (input <= 0.3) {
+            return 0;
+        }
+        const [v, o] = [
+            [0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
+            [1, 14, 27, 41, 55, 68, 82, 97],
+        ];
+        const c = Math.max(v[0], Math.min(input, v[v.length - 1]));
+        const i = v.findIndex((val) => val >= c);
+        return i === -1
+            ? o[o.length - 1]
+            : o[i - 1] +
+                  ((c - v[i - 1]) / (v[i] - v[i - 1])) * (o[i] - o[i - 1]);
+    }
+    function ligcap(input) {
+        if (input <= 0.3) {
+            return 0;
+        }
+        const [v, o] = [
+            [0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
+            [2, 13, 24, 35, 47, 57, 69, 80],
+        ];
+        const c = Math.max(v[0], Math.min(input, v[v.length - 1]));
+        const i = v.findIndex((val) => val >= c);
+        return i === -1
+            ? o[o.length - 1]
+            : o[i - 1] +
+                  ((c - v[i - 1]) / (v[i] - v[i - 1])) * (o[i] - o[i - 1]);
+    }
 };
-function setLineHeight(vl) {
-    global.leading = lh((global.vl = vl));
-    setprop('--lh', `${global.leading.toFixed(2)}`);
-}
-
-function setFontVariable() {
-    setprop('--lig', `${global.vl.toFixed(2)}`);
-    setprop('--lig_cap', `${ligcap(global.leading).toFixed(2)}`);
-    setprop('--lig_des', `${ligdes(global.leading).toFixed(2)}`);
-}
-
-function setLeading(vl) {
-    setLineHeight(vl);
-    setFontVariable();
-}
-
-function lh(x) {
-    return 0.3 + ((Math.min(88, Math.max(x, 8)) - 8) / (88 - 8)) * (1 - 0.3);
-}
-function ligdes(input) {
-    if (input <= 0.3) {
-        return 0;
-    }
-    const [v, o] = [
-        [0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
-        [1, 14, 27, 41, 55, 68, 82, 97],
-    ];
-    const c = Math.max(v[0], Math.min(input, v[v.length - 1]));
-    const i = v.findIndex((val) => val >= c);
-    return i === -1
-        ? o[o.length - 1]
-        : o[i - 1] + ((c - v[i - 1]) / (v[i] - v[i - 1])) * (o[i] - o[i - 1]);
-}
-function ligcap(input) {
-    if (input <= 0.3) {
-        return 0;
-    }
-    const [v, o] = [
-        [0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
-        [2, 13, 24, 35, 47, 57, 69, 80],
-    ];
-    const c = Math.max(v[0], Math.min(input, v[v.length - 1]));
-    const i = v.findIndex((val) => val >= c);
-    return i === -1
-        ? o[o.length - 1]
-        : o[i - 1] + ((c - v[i - 1]) / (v[i] - v[i - 1])) * (o[i] - o[i - 1]);
-}
 
 function readyToExecute() {
     if (++ready == 2) {
@@ -383,10 +369,9 @@ function readyToExecute() {
     }
 }
 
-async function calculateLigature(slow) {
+async function calculateLigature() {
+    await wait(200);
     div.innerHTML = '';
-    viewer.classList[slow ? 'add' : 'remove']('lig');
-    interact(nav_handle).draggable(false);
 
     let parr = divx.querySelectorAll('p');
     let up_arr_prev = [];
@@ -568,6 +553,14 @@ async function calculateLigature(slow) {
 
             //spacing below
             let descenderlength = down_arr_span_tong.length;
+            if (i == parr.length - 1) {
+                let span_ = $create('span');
+                span_.innerHTML = 'a';
+                span_.style.visibility = 'hidden';
+                span_.wght = 'lineheightkeep';
+                render_arr[count].push($create('br'), span_);
+                descenderlength--;
+            }
 
             //descender_prev
             {
@@ -616,72 +609,50 @@ async function calculateLigature(slow) {
     }
 
     // fully render
-    const frag = slow ? div : new DocumentFragment();
-    //spacing below
-    const span_hid = $create('span');
-    span_hid.innerHTML = 'a';
-    span_hid.style.visibility = 'hidden';
-    span_hid.wght = 'lineheightkeep';
-    const break_hid = $create('br');
-    frag.append(break_hid, span_hid);
     for (let x = 0; x < render_arr_arr.length; x++) {
-        const cursor = $create('span_');
-        cursor.classList.add('cursor');
-        //
         let p_ = $create('p');
-        slow && frag.insertBefore(p_, break_hid);
         //spacing above
         if (x == 0 || render_arr_arr[x][0].length == 0) {
             p_.append($create('br'));
         }
-        p_.append(cursor);
         for (let i = 0; i < render_arr_arr[x].length; i++) {
             let baretxt = '';
-            let span_ = $create('span_');
-            slow && p_.insertBefore(span_, cursor);
             for (let k = 0; k < render_arr_arr[x][i].length; k++) {
-                let elem = render_arr_arr[x][i][k];
-                slow && (await wait(100));
-                if (typeof elem == 'string') {
-                    baretxt += elem;
-                    span_.innerHTML += elem;
+                if (typeof render_arr_arr[x][i][k] == 'string') {
+                    baretxt += render_arr_arr[x][i][k];
                 } else {
                     if (baretxt == '') {
-                        elem.style.marginLeft = '0';
-                        p_.insertBefore(elem, cursor);
+                        render_arr_arr[x][i][k].style.marginLeft = '0';
+                        p_.append(render_arr_arr[x][i][k]);
                     } else {
-                        slow || p_.insertBefore(span_, cursor);
-                        p_.insertBefore(elem, cursor);
+                        p_.append(baretxt, render_arr_arr[x][i][k]);
                     }
                     baretxt = '';
-                    span_ = $create('span_');
-                    slow && p_.insertBefore(span_, cursor);
-                    slow && (await wait(20));
-                    elem.classList.add(elem.wght);
                 }
             }
             if (baretxt != '') {
-                slow || p_.insertBefore(span_, cursor);
+                p_.append(baretxt);
             }
         }
-        cursor.remove();
-        slow || frag.insertBefore(p_, break_hid);
+        div.append(p_);
     }
-    slow || div.append(frag);
 
     // animation
-    delaypromise = delaypromise.then(function (check) {
-        if (check) {
-            setFontVariable();
-            //console.log('calc');
-        }
-        return new Promise(function (resolve) {
-            resolve(true);
-        });
-    });
     await wait(100);
-    viewer.classList.add('lig');
-    connector();
+    let allspan = viewer.querySelectorAll('span');
+    viewer.classList.add('anim');
+    allspan[0].ontransitionend = (event) => {
+        viewer.classList.remove('anim');
+        allspan[0].ontransitionend = null;
+    };
+    for (let i = 0; i < allspan.length; i++) {
+        allspan[i].classList.add(allspan[i].wght);
+    }
+    //
+    if (resizecheck) {
+        resizeObserver.observe(divx);
+        resizecheck = false;
+    }
 }
 
 function collapseWhiteSpace(value) {
@@ -692,35 +663,40 @@ function wait(delay) {
     return new Promise((resolve) => setTimeout(resolve, delay));
 }
 
-function setText(text) {
-    disconnector();
-    divx.innerHTML = '';
+async function setText() {
+    resizeObserver.disconnect();
+    resizecheck = true;
+    //console.log(document.getElementById('textareabox').value);
+    let text = document
+        .getElementById('textareabox')
+        .value.replace(/[%*{}]/g, '');
+    document.getElementById('textareabox').value = text;
+    //
     let textarr = text.split('\n');
+    divx.innerHTML = '';
     for (let i = 0; i < textarr.length; i++) {
-        const txt = textarr[i];
-        let txt_ = '';
-        for (let k = 0; k < txt.length; k++) {
-            list[txt[k]]
-                ? (txt_ += txt[k])
-                : terminal.error(
-                      `'${txt[k]}' at${
-                          i == 0 ? '' : ` paragraph:${i + 1}`
-                      } char:${k + 1} is not available so we have to remove it!`
-                  );
-        }
         let p__ = $create('p');
-        let textnode = document.createTextNode(txt_);
+        let textnode = document.createTextNode(textarr[i]);
         p__.appendChild(textnode);
         divx.append(p__);
     }
 
-    delay_calculateLigature(true);
+    delay_calculateLigature();
 }
 
 function toggleLig() {
+    let span = viewer.querySelector('span');
+    if (span) {
+        viewer.classList.add('anim');
+        span.ontransitionend = () => {
+            viewer.classList.remove('anim');
+            span.ontransitionend = null;
+        };
+    }
     div.classList.toggle('lig');
 }
 
+//window.onresize = delay_calculateLigature;
 let prevWidth = 0;
 const resizeObserver = new ResizeObserver((entries) => {
     for (const entry of entries) {
@@ -733,25 +709,25 @@ const resizeObserver = new ResizeObserver((entries) => {
 });
 
 let checkrs = true;
-function delay_calculateLigature(slow = false) {
+function delay_calculateLigature() {
     if (checkrs) {
-        //viewer.classList.add('anim');
-        viewer.classList.remove('lig');
+        viewer.classList.add('anim');
+        let spanani =
+            div.querySelector('span.alt') || div.querySelector('span.altshort');
+        if (spanani) {
+            let spaninit = div.querySelectorAll('span');
+            for (let i = 0; i < spaninit.length; i++) {
+                spaninit[i].className = '';
+            }
+        }
         checkrs = false;
-        delaypromise = delaypromise.then(function (check) {
-            //console.log('delaycalc');
-            return new Promise(function (resolve) {
-                resolve(false);
-            });
-        });
     }
 
     if (timeout !== null) {
         clearTimeout(timeout);
     }
     timeout = setTimeout(function () {
-        disconnector(false);
-        calculateLigature(slow);
+        calculateLigature();
         timeout = null;
         checkrs = true;
     }, 600);
@@ -797,43 +773,4 @@ function getScrollbarWidth() {
     outer.parentNode.removeChild(outer);
 
     return scrollbarWidth;
-}
-
-//nav reisze
-{
-    interact(nav_handle)
-        .draggable({
-            modifiers: [
-                interact.modifiers.snap({
-                    targets: [
-                        interact.snappers.grid({
-                            x: 25,
-                            y: 25,
-                        }),
-                    ],
-                    range: Infinity,
-                    relativePoints: [{ x: 0, y: 0 }],
-                }),
-                interact.modifiers.restrictRect({
-                    restriction: document.body,
-                }),
-            ],
-            inertia: false,
-        })
-        .on('dragmove', function (event) {
-            setprop('--nav_left_max', `${event.rect.left}px`);
-            setprop('--nav_top', `${event.rect.top}px`);
-            setLineHeight((event.rect.top / leadingMaxRange) * (88 - 8) + 8);
-        })
-        .on('dragend', function (event) {
-            delaypromise = delaypromise.then(function (check) {
-                if (check) {
-                    setFontVariable();
-                    //console.log('dragend');
-                }
-                return new Promise(function (resolve) {
-                    resolve(true);
-                });
-            });
-        });
 }

@@ -1,5 +1,5 @@
 'use strict';
-const $_ = document.querySelector.bind(document);
+const $ = document.querySelector.bind(document);
 const $$ = document.querySelectorAll.bind(document);
 const $create = document.createElement.bind(document);
 const $createcomment = document.createComment.bind(document);

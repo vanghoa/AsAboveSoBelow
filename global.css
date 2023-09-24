@@ -1,0 +1,291 @@
+:root {
+    /* Terminal Settings */
+    --size: 1.2;
+    /* Global Settings */
+    --unit: 0px;
+    --fonturl: 'AsAbove,SoBelow(Beta53)VF.ttf';
+    --lh: 1;
+    --lig: 88;
+    --lig_cap: 79;
+    --lig_extra: 9;
+    --lig_des: 96;
+    --purple: #796e7a;
+    --white: #e8efef;
+    --nav_left_max: 50vw;
+    --vh: 1vh;
+    --border_w: 1.8px;
+    --nav_top: calc(50 * var(--vh) - 5.3em / 2);
+    --nav_handle_size: 2.3rem;
+    --nav_padding: 0.8em;
+    --nav_left: min(
+        calc(100vw - var(--nav_handle_size)),
+        max(var(--nav_left_max), calc(0.3em + var(--nav_padding) * 2))
+    );
+    --nav_w: calc(var(--nav_left) + var(--nav_handle_size) / 2);
+    --section_w: calc(100vw - var(--nav_w));
+}
+
+* {
+    box-sizing: border-box;
+    font-size: 20px;
+    margin: 0;
+    padding: 0;
+}
+
+@font-face {
+    font-family: 'asabovesobelow';
+    src: url('AsAbove,SoBelow(Beta53)VF.ttf');
+}
+
+section * {
+    font-family: asabovesobelow;
+    font-variation-settings: 'wght' 0;
+    color: white;
+    font-kerning: normal;
+}
+
+body {
+    background-color: black;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    overflow: hidden;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    width: 100%;
+    height: 100%;
+}
+
+#viewer-wrapper {
+    padding-right: 0.8rem;
+    padding-left: 2rem;
+    padding-top: 0;
+    overflow-y: scroll;
+    position: relative;
+    flex: 1;
+    background: linear-gradient(to left, var(--purple), black);
+}
+
+span {
+    font-kerning: none;
+}
+
+span_ {
+    display: inline;
+}
+
+span_.cursor {
+    display: inline-block;
+    width: 0.5em;
+    height: calc(var(--lh) * 1.8em);
+    line-height: 0;
+    position: relative;
+    background-color: var(--white);
+}
+
+.anim span {
+    transition: font-variation-settings 0.5s;
+    will-change: font-variation-settings;
+}
+
+.lig .lig p,
+.lig .lig {
+    overflow-y: visible;
+}
+
+.lig .lig span.alt {
+    font-variation-settings: 'wght' var(--lig);
+}
+
+.lig .lig span.altshort {
+    font-variation-settings: 'wght' var(--lig_cap);
+}
+
+.lig .lig span.alt.des {
+    font-variation-settings: 'wght' var(--lig_des);
+}
+
+.lig .lig span.alt.letter_t {
+    font-variation-settings: 'wght' calc(var(--lig) + var(--lig_extra));
+}
+
+.lig .lig span.altshort.letter_t {
+    font-variation-settings: 'wght' calc(var(--lig_cap) + var(--lig_extra));
+}
+
+p {
+    width: 100%;
+}
+
+#viewer {
+    min-height: 1000vh;
+    width: 100%;
+    max-width: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+#viewer > div > p {
+    line-height: calc(var(--lh) * 3.64em);
+    transition: line-height 0.5s;
+}
+
+#viewer > div {
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden; /* overflow */
+    left: 0;
+    top: 0;
+    padding-right: 1px;
+}
+
+#viewer > div > p:first-child:first-line,
+.lineheightkeep {
+    line-height: 3.64em;
+}
+
+nav {
+    width: var(--nav_w);
+    padding-right: 1.5rem;
+    position: relative;
+    /*
+    top: 0.13em;*/
+}
+/*
+nav #nav_handle {
+    width: var(--nav_handle_size);
+    height: 100%;
+    background-color: transparent;
+    position: absolute;
+    touch-action: none;
+    user-select: none;
+    left: var(--nav_left);
+    top: 0;
+    z-index: 100;
+    text-align: center;
+    font-family: asabovesobelow;
+    word-break: break-all;
+    color: var(--white);
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1.4em auto 1.5em auto 1em;
+    line-height: 0.4em;
+    align-items: center;
+    justify-items: center;
+}
+
+nav #nav_handle span {
+    position: relative;
+}
+
+nav #nav_handle span.filler {
+    width: 0.2em;
+    overflow: hidden;
+    height: 100%;
+}
+*/
+nav #nav_handle {
+    width: var(--nav_handle_size);
+    height: 4.8em;
+    background-color: var(--white);
+    border: solid var(--border_w) var(--purple);
+    border-radius: 25px;
+    position: absolute;
+    touch-action: none;
+    user-select: none;
+    left: var(--nav_left);
+    top: min(calc((100 * var(--vh)) - 5.3em), var(--nav_top));
+    z-index: 100;
+    text-align: center;
+    font-family: 'asabovesobelow';
+    word-break: break-all;
+    font-variation-settings: 'wght' 0;
+    color: var(--purple);
+    padding: 0.5em 0.3em;
+    line-height: 1em;
+}
+
+nav #nav_line {
+    --line_w: calc(6px / var(--pixel-density, 1) - var(--border_w));
+    pointer-events: none;
+    position: absolute;
+    z-index: 50;
+    height: 100%;
+    width: var(--line_w);
+    border: solid var(--border_w) var(--purple);
+    box-sizing: content-box;
+    background-color: var(--white);
+    top: 0;
+    left: calc(
+        var(--nav_left) + var(--nav_handle_size) / 2 - var(--line_w) / 2
+    );
+}
+
+nav #nav_handle::after {
+    content: 'leading';
+    display: block;
+    writing-mode: vertical-lr;
+}
+/* Terminal */
+#terminal {
+    width: 100%;
+    height: 100%;
+    --color: var(--white);
+    --animation: terminal-glow;
+}
+
+#terminal *::selection {
+    background: var(--purple) !important;
+    color: var(--white) !important;
+}
+
+.terminal-output > :nth-child(n + 2) {
+    --color: var(--purple);
+}
+/* auto complete menu */
+.cmd .cursor-wrapper ul {
+    text-shadow: var(
+        --text-shadow,
+        0 0 calc(var(--glow) * 5px) var(--color, #ccc)
+    );
+    font-size: inherit;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    float: left;
+    position: absolute;
+    top: 1.3em;
+    left: 0;
+}
+.cmd .cursor-wrapper li {
+    font-size: inherit;
+    cursor: pointer;
+    white-space: nowrap;
+}
+.cmd .cursor-wrapper li:hover {
+    background: var(--purple);
+    color: var(--white);
+    font-size: inherit;
+}
+.cursor-wrapper {
+    position: relative;
+}
+
+@media only screen and (max-width: 1300px) {
+    :root {
+        --size: 1;
+    }
+    * {
+        font-size: 18px;
+    }
+}
+
+@media only screen and (max-width: 600px) {
+    :root {
+        --size: 0.8;
+    }
+    * {
+        font-size: 15px;
+    }
+}

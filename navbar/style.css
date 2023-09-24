@@ -39,14 +39,15 @@ main {
     display: flex;
 }
 nav {
-    font-size: 25px; /* control */
+    font-size: 18px; /* control */
     --nav_padding: 0.8em;
     --nav_left: min(
         calc(100vw - var(--nav_handle_size)),
         max(var(--nav_left_max), calc(0.3em + var(--nav_padding) * 2))
     );
     --nav_unit: calc(1em / (20 / 1.4));
-    width: calc(var(--nav_left) + var(--nav_handle_size) / 2);
+    --nav_final_left: calc(var(--nav_left) + var(--nav_handle_size) / 2);
+    width: var(--nav_final_left);
     height: 100%;
     background-color: var(--white);
     overflow: visible;
@@ -59,12 +60,19 @@ nav.help {
 }
 
 nav #overflow {
-    padding: var(--nav_padding);
     padding-top: calc(var(--nav_padding) + 2.8em);
+    padding-bottom: var(--nav_padding);
     width: 100%;
     height: 100%;
     overflow-x: hidden;
     overflow-y: auto;
+}
+
+nav #offsetscrollbar {
+    padding-left: var(--nav_padding);
+    padding-right: var(--nav_padding);
+    width: var(--nav_final_left);
+    position: relative;
 }
 
 nav #overflow > * {

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link
+            rel="apple-touch-icon"
+            sizes="180x180"
+            href="./favicon/apple-touch-icon.png"
+        />
+        <link
+            rel="icon"
+            type="image/png"
+            sizes="32x32"
+            href="./favicon/favicon-32x32.png"
+        />
+        <link
+            rel="icon"
+            type="image/png"
+            sizes="16x16"
+            href="./favicon/favicon-16x16.png"
+        />
+        <link rel="manifest" href="./favicon/site.webmanifest" />
+        <title>As Above So Below</title>
+        <link rel="stylesheet" href="normalize.css" />
+        <style>
+            :root {
+                --unit: 0px;
+                --fonturl: 'AsAbove,SoBelow(Beta53)VF.ttf';
+                --lh: 1;
+                --lig: 88;
+                --lig_cap: 79;
+                --lig_extra: 9;
+                --lig_des: 96;
+            }
+
+            @font-face {
+                font-family: 'asabovesobelow';
+                src: url('AsAbove,SoBelow(Beta53)VF.ttf');
+            }
+
+            * {
+                box-sizing: border-box;
+                font-family: asabovesobelow;
+                font-size: 20px;
+                line-height: calc(var(--lh) * 3.64em);
+                margin: 0;
+                padding: 0;
+                font-variation-settings: 'wght' 0;
+                color: white;
+                font-kerning: normal;
+            }
+
+            body,
+            textarea,
+            input {
+                background-color: black;
+                padding: 1rem;
+                margin-bottom: 1rem;
+            }
+
+            body {
+                overflow-y: scroll;
+                padding: 2rem;
+                min-height: 1000vh;
+            }
+
+            span {
+                font-variation-settings: 'wght' 0;
+                font-kerning: none;
+            }
+
+            .anim span {
+                transition: font-variation-settings 0.5s;
+            }
+
+            .lig span.alt {
+                font-variation-settings: 'wght' var(--lig);
+            }
+
+            .lig span.altshort {
+                font-variation-settings: 'wght' var(--lig_cap);
+            }
+
+            .lig span.alt.des {
+                font-variation-settings: 'wght' var(--lig_des);
+            }
+
+            .lig span.alt.letter_t {
+                font-variation-settings: 'wght'
+                    calc(var(--lig) + var(--lig_extra));
+            }
+
+            .lig span.altshort.letter_t {
+                font-variation-settings: 'wght'
+                    calc(var(--lig_cap) + var(--lig_extra));
+            }
+
+            p {
+                width: 100%;
+            }
+
+            #input {
+                width: 100%;
+                line-height: 0px;
+            }
+
+            #input > div {
+                max-width: 5rem;
+            }
+
+            #input > div > input {
+                display: block;
+                margin-top: 0.5rem;
+                width: 100%;
+            }
+
+            input {
+                background-color: rgb(33, 33, 33);
+            }
+
+            textarea {
+                width: 100%;
+                resize: vertical;
+                height: 10rem;
+            }
+
+            #input * {
+                font-family: Arial, Helvetica, sans-serif;
+                font-size: 15px;
+                line-height: 1.5em;
+                display: inline-block;
+            }
+
+            #viewer {
+                width: 100%;
+                max-width: 100%;
+                position: relative;
+                resize: horizontal;
+                overflow: hidden;
+                background: linear-gradient(
+                    135deg,
+                    black 0,
+                    black 98%,
+                    #fff 98.001%
+                );
+            }
+
+            #viewer > div {
+                position: relative;
+                width: 100%;
+                max-width: 100%;
+                overflow: hidden; /* overflow */
+                left: 0;
+                top: 0;
+                padding-right: 1px;
+            }
+
+            #viewer > div > p:first-child:first-line,
+            .lineheightkeep {
+                line-height: 3.64em;
+            }
+        </style>
+        <script src="lodash.custom.min.js"></script>
+        <script src="opentype.js"></script>
+        <script src="index.js" defer></script>
+        <!-- using global declaration -->
+        <script src="https://cdn.jsdelivr.net/npm/opentype.js"></script>
+    </head>
+    <body>
+        <div id="input">
+            <textarea
+                id="textareabox"
+                name="textarea1"
+                placeholder="Write something ..."
+            ></textarea>
+            <input type="button" value="Sample text" onclick="setText()" />
+            <div>
+                Leading
+                <input
+                    type="range"
+                    min="8"
+                    max="88"
+                    value="88"
+                    id="leading"
+                    style="padding: 0; margin: 0"
+                />
+            </div>
+            <input
+                type="button"
+                value="Toggle ligature"
+                onclick="toggleLig()"
+            />
+            <input type="button" value="Vector generate" onclick="pdfprint()" />
+        </div>
+        <div id="viewer" class="anim">
+            <div style="position: absolute; visibility: hidden">
+                <p>
+                    HOmOtgLUS B ORChId MANtIs THIS SCulptURaL STUDy oF the
+                    lIFefOrm KnowN aS coLlOQUIaLLY AS THe ORCHId MANTIs ExhiBiTs
+                    sOMe cuRiOuS HybRId ANd cHimERic BEhaVIoRS THAT refER boTh
+                    To PLanTS aND anImAls NOT mUCh IS KNown of ITs AnAtomY or
+                    BEhavioR bUt THE desiGn Of tHIs scuLptUre IMPLIeS thAT it
+                    seRvED As A KIND OF rELIGiOus objeCT as well As A FOCuS fOr
+                    RItuaL actIViTY antHrOPOLOGIsTS hAvE surmiSEd THAt IT MIgHt
+                    HaVE been uSED iN praCtICES rELatING to thERIaNtHROpy or
+                    ShaPeShIfTING where IDEnTiTy gEnDeR sPecIes AnD genUS are
+                    fLuid In tHE CoNtExt OF THE ritUAl sPACE wIthoUt OtheR
+                    ArtifacTS we Can oNLY GUESs at thE nAtURe OF ThE SocieTY
+                    ThAt CReatEd thIS ObJeCT aNd how thEiR PEOPle MIghT HAVE
+                    lIveD aRTiFacts FROM THE age Of COLLApSe
+                </p>
+            </div>
+            <div class="lig">
+                <p>
+                    <br />
+                    HOmOtgLUS B ORChId MANtIs THIS SCulptURaL STUDy oF the
+                    lIFefOrm KnowN aS coLlOQUIaLLY AS THe ORCHId MANTIs ExhiBiTs
+                    sOMe cuRiOuS HybRId ANd cHimERic BEhaVIoRS THAT refER boTh
+                    To PLanTS aND anImAls NOT mUCh IS KNown of ITs AnAtomY or
+                    BEhavioR bUt THE desiGn Of tHIs scuLptUre IMPLIeS thAT it
+                    seRvED As A KIND OF rELIGiOus objeCT as well As A FOCuS fOr
+                    RItuaL actIViTY antHrOPOLOGIsTS hAvE surmiSEd THAt IT MIgHt
+                    HaVE been uSED iN praCtICES rELatING to thERIaNtHROpy or
+                    ShaPeShIfTING where IDEnTiTy gEnDeR sPecIes AnD genUS are
+                    fLuid In tHE CoNtExt OF THE ritUAl sPACE wIthoUt OtheR
+                    ArtifacTS we Can oNLY GUESs at thE nAtURe OF ThE SocieTY
+                    ThAt CReatEd thIS ObJeCT aNd how thEiR PEOPle MIghT HAVE
+                    lIveD aRTiFacts FROM THE age Of COLLApSe
+                </p>
+            </div>
+        </div>
+    </body>
+</html>
