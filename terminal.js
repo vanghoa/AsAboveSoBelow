@@ -9,6 +9,85 @@ const connector = () => {
     interact(nav_handle).draggable(true);
     terminal.resume();
 };
+const color = {
+    w: $('html').css('--white'),
+    p: $('html').css('--purple'),
+};
+const instruction = `
+> [[;${color.w};${color.p}] cast ] followed by [[;${color.w};${color.p}] text ] : print out text;
+> [[;${color.w};${color.p}] spell-cast ] : toggle ligature;
+> [[;${color.w};${color.p}] death-cast ] : download vector file;
+> type just anything : input to The Alphabetical Order!`;
+const chatCommand = (arg) => {
+    if (arg.length > 200) {
+        throw new Error(
+            `Please input a shorter text! Due to limited tokens, we cannot handle a long chat-gpt inquiry.`
+        );
+    }
+    let shoultStop = false;
+    const animationstep = [
+        'Processing',
+        'Processing.',
+        'Processing..',
+        'Processing...',
+    ];
+    let count = 0;
+    terminal.echo(`
+${animationstep[count]}`);
+    let index = terminal.last_index();
+    let timer = setInterval(() => {
+        if (shoultStop) {
+            let exportview = terminal.export_view();
+            exportview.lines.pop();
+            terminal.import_view(exportview);
+            clearInterval(timer);
+        } else {
+            count = count == animationstep.length - 1 ? 0 : count + 1;
+            terminal.update(
+                index,
+                `
+${animationstep[count]}`
+            );
+        }
+    }, 500);
+    const newgpt_msg = { role: 'user', content: `${arg}` };
+    gpt_msg.push(newgpt_msg);
+    fetch('https://asabovesobelow.azurewebsites.net/api/asabovesobelow', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            messages: gpt_msg,
+        }),
+    })
+        .then((res) => res.json())
+        .then((data) => {
+            if (data.error) {
+                throw new Error(data.msg);
+            } else {
+                shoultStop = true;
+                data = data.completion;
+                // prettier-ignore
+                /*
+                terminal.echo(`[[;${color.p};]${data.model} usage at ${data.created}:
+[[;${color.w};]+ prompt_tokens:] ${data.usage.prompt_tokens}
+[[;${color.w};]+ completion_tokens:] ${data.usage.completion_tokens}
+[[;${color.w};]+ total_tokens:] ${data.usage.total_tokens}]`)
+*/
+                gpt_msg.push({
+                    role: 'assistant',
+                    content: `${data.choices[0].message.content}`,
+                });
+                setText(data.choices[0].message.content);
+            }
+        })
+        .catch((err) => {
+            connector();
+            shoultStop = true;
+            terminal.error(err);
+        });
+};
 const commands = {
     /*
     leading: {
@@ -29,51 +108,6 @@ const commands = {
             setText(arg);
         },
     },
-    'fore-cast': {
-        run(arg) {
-            if (arg.length > 200) {
-                throw new Error(
-                    `Please input a shorter text! Due to limited tokens, we cannot handle a long chat-gpt inquiry.`
-                );
-            }
-            const newgpt_msg = { role: 'user', content: `${arg}` };
-            gpt_msg.push(newgpt_msg);
-            fetch(
-                'https://asabovesobelow.azurewebsites.net/api/asabovesobelow',
-                {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        messages: gpt_msg,
-                    }),
-                }
-            )
-                .then((res) => res.json())
-                .then((data) => {
-                    if (data.error) {
-                        throw new Error(data.msg);
-                    } else {
-                        data = data.completion;
-                        // prettier-ignore
-                        terminal.echo(`[[;${color.p};]${data.model} usage at ${data.created}:
-        [[;${color.w};]+ prompt_tokens:] ${data.usage.prompt_tokens}
-        [[;${color.w};]+ completion_tokens:] ${data.usage.completion_tokens}
-        [[;${color.w};]+ total_tokens:] ${data.usage.total_tokens}]`)
-                        gpt_msg.push({
-                            role: 'assistant',
-                            content: `${data.choices[0].message.content}`,
-                        });
-                        setText(data.choices[0].message.content);
-                    }
-                })
-                .catch((err) => {
-                    connector();
-                    terminal.error(err);
-                });
-        },
-    },
     'spell-cast': {
         run() {
             toggleLig();
@@ -84,6 +118,13 @@ const commands = {
     'death-cast': {
         run() {
             pdfprint();
+            connector();
+        },
+        noarg: true,
+    },
+    instruction: {
+        run() {
+            terminal.echo(instruction);
             connector();
         },
         noarg: true,
@@ -99,10 +140,6 @@ const commands = {
     },
     */
 };
-const color = {
-    w: $('html').css('--white'),
-    p: $('html').css('--purple'),
-};
 //const uap = new UAParser().getResult();
 const terminal = $('#terminal').terminal(
     function (cmd) {
@@ -110,9 +147,11 @@ const terminal = $('#terminal').terminal(
             disconnector();
             cmd = $.terminal.parse_command(cmd);
             if (!commands[cmd.name]) {
+                chatCommand(cmd.command);
                 // prettier-ignore
+                /*
                 throw new Error(`Order '${cmd.name}' not found! Plese check the spelling of the command again.
-At line:1 char:1`);
+At line:1 char:1`); */
             } else if (cmd.rest == '' && !commands[cmd.name]?.noarg) {
                 throw new Error(`Order '${cmd.name}' requires 1 argument(s) to be specified; found 0. Please do not use empty '' argument!
 At line:1 char:${cmd.name.length}`);
@@ -155,23 +194,10 @@ At line:1 char:${cmd.name.length}`);
                 resolve(list || []);
             });
         },
-        greetings: `
-This is The Alphabetical Order beta@1.0
-        
-Here is the list of orders you can use:
-  > [[;${color.w};${color.p}] cast ] followed by [[;${color.w};${color.p}] text ] : print out text;
-    Example: [[;${color.w};${color.p}] cast the alphabetical order ] will print out 'the alphabetical order';
-  > [[;${color.w};${color.p}] spell-cast ] : toggle the ligature option;
-  > [[;${color.w};${color.p}] death-cast ] : give you the vector file of the text;
-  > [[;${color.w};${color.p}] fore-cast ] followed by [[;${color.w};${color.p}] inquiry ] : ask chat-gpt whatever your inquiry is. Please use this order sparingly as the chat-gpt AI costs real money;
-    Example: [[;${color.w};${color.p}] fore-cast can you access the internet? ] will input the inquiry to chat-gpt and the answer will be printed out;
-
-Some shortcuts that might be helpful:
-  > [[;black;${color.w}] tab ] : autocompletion;
-  > [[;black;${color.w}] arrow key up ] / [[;black;${color.w}] arrow key down ] : access previous orders;`,
-        mobileDelete: true,
         prompt: `
-[[;${color.w};]> ]` /* `[[;${color.w};]
+> `,
+        greetings: `
+The Alphabetical Order is awaiting your inquiries...` /* `[[;${color.w};]
 @:\\${uap.os.name
             .replace(' ', '')
             .replace('OS', '')}-OS\\${uap.browser.name.replace(

@@ -1,6 +1,6 @@
 :root {
     /* Terminal Settings */
-    --size: 1.2;
+    --size: 1;
     /* Global Settings */
     --unit: 0px;
     --fonturl: 'AsAbove,SoBelow(Beta53)VF.ttf';
@@ -27,7 +27,7 @@
 
 * {
     box-sizing: border-box;
-    font-size: 20px;
+    font-size: 15px;
     margin: 0;
     padding: 0;
 }
@@ -63,7 +63,9 @@ body {
     overflow-y: scroll;
     position: relative;
     flex: 1;
-    background: linear-gradient(to left, var(--purple), black);
+    background: var(
+        --purple
+    ); /*linear-gradient(to left, var(--purple), black);*/
 }
 
 span {
@@ -277,7 +279,7 @@ nav #nav_handle::after {
         --size: 1;
     }
     * {
-        font-size: 18px;
+        font-size: 15px;
     }
 }
 

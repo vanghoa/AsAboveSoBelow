@@ -21,7 +21,7 @@ app.http('asabovesobelow', {
                     },
                     ...messages,
                 ],
-                max_tokens: 40,
+                max_tokens: 300,
             });
             return { jsonBody: { completion: response } };
         } catch (error) {
