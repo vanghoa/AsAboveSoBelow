@@ -13,14 +13,7 @@ app.http('asabovesobelow', {
             context.log(messages);
             const response = await openai.chat.completions.create({
                 model: 'gpt-3.5-turbo',
-                messages: [
-                    {
-                        role: 'system',
-                        content:
-                            'You are a helpful chatGPT with philosophy and the arts',
-                    },
-                    ...messages,
-                ],
+                messages: [...messages],
                 max_tokens: 300,
             });
             return { jsonBody: { completion: response } };

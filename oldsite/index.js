@@ -200,19 +200,19 @@ buffer.then((data) => {
     font.getKerningValue(font.charToGlyph('r'), font.charToGlyph('e'))/10
     */
     // ascender
-    list.as('b', 70, [2], [], 2, [5]);
-    list.as('d', 70, [9], [], 9, [5]);
+    list.as('b', 70, [2], [2], 2, [5]);
+    list.as('d', 70, [9], [9], 9, [5]);
     list.as('f', 35, [3], [], 4);
-    list.as('h', 63, [2, 8], [], 2);
-    list.as('k', 56, [2, 8], [], 2);
-    list.as('l', 21, [2], [], 2);
+    list.as('h', 63, [2, 8], [2], 2);
+    list.as('k', 56, [2, 8], [2], 2);
+    list.as('l', 21, [2], [2], 2);
     // descender
     list.des('g', 70, [], [9], 8);
     list.des('j', 21, [], [2], 1);
-    list.des('p', 70, [], [2], 2, [5]);
-    list.des('q', 70, [], [9], 9, [5]);
-    list.des('y', 63, [], [2, 8], 8, [3]);
-    list.des('t', 35, [], [3], 3);
+    list.des('p', 70, [2], [2], 2, [5]);
+    list.des('q', 70, [9], [9], 9, [5]);
+    list.des('y', 63, [8], [2, 8], 8, [3]);
+    list.des('t', 35, [3], [3], 3);
     // lowercase
     list.lowercase('a', 56, [7], [], [3, 4]);
     list.lowercase('c', 56, [], [], [4, 5]);

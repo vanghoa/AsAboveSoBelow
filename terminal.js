@@ -18,6 +18,7 @@ const instruction = `
 > [[;${color.w};${color.p}] spell-cast ] : toggle ligature;
 > [[;${color.w};${color.p}] death-cast ] : download vector file;
 > type just anything : input to The Alphabetical Order!`;
+
 const chatCommand = (arg) => {
     if (arg.length > 200) {
         throw new Error(
@@ -25,6 +26,13 @@ const chatCommand = (arg) => {
         );
     }
     let shoultStop = false;
+    function stopProcessing() {
+        clearInterval(timer);
+        shoultStop = true;
+        let exportview = terminal.export_view();
+        exportview.lines.pop();
+        terminal.import_view(exportview);
+    }
     const animationstep = [
         'Processing',
         'Processing.',
@@ -36,12 +44,7 @@ const chatCommand = (arg) => {
 ${animationstep[count]}`);
     let index = terminal.last_index();
     let timer = setInterval(() => {
-        if (shoultStop) {
-            let exportview = terminal.export_view();
-            exportview.lines.pop();
-            terminal.import_view(exportview);
-            clearInterval(timer);
-        } else {
+        if (!shoultStop) {
             count = count == animationstep.length - 1 ? 0 : count + 1;
             terminal.update(
                 index,
@@ -52,7 +55,7 @@ ${animationstep[count]}`
     }, 500);
     const newgpt_msg = { role: 'user', content: `${arg}` };
     gpt_msg.push(newgpt_msg);
-    fetch('https://asabovesobelow.azurewebsites.net/api/asabovesobelow', {
+    fetch('https://formandagency.net/api/openai', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -66,7 +69,7 @@ ${animationstep[count]}`
             if (data.error) {
                 throw new Error(data.msg);
             } else {
-                shoultStop = true;
+                stopProcessing();
                 data = data.completion;
                 // prettier-ignore
                 /*
@@ -84,8 +87,9 @@ ${animationstep[count]}`
         })
         .catch((err) => {
             connector();
-            shoultStop = true;
-            terminal.error(err);
+            stopProcessing();
+            terminal.error(`
+${err}`);
         });
 };
 const commands = {
