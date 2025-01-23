@@ -128,19 +128,19 @@ if (selection.length > 0) {
 
     //font width and stem pos
     {
-        list.as('b', 70, [2], [], 2, [5]);
-        list.as('d', 70, [9], [], 9, [5]);
+        list.as('b', 70, [2], [2], 2, [5]);
+        list.as('d', 70, [9], [9], 9, [5]);
         list.as('f', 35, [3], [], 4);
-        list.as('h', 63, [2, 8], [], 2);
-        list.as('k', 56, [2, 8], [], 2);
-        list.as('l', 21, [2], [], 2);
+        list.as('h', 63, [2, 8], [2], 2);
+        list.as('k', 56, [2, 8], [2], 2);
+        list.as('l', 21, [2], [2], 2);
         // descender
         list.des('g', 70, [], [9], 8);
         list.des('j', 21, [], [2], 1);
-        list.des('p', 70, [], [2], 2, [5]);
-        list.des('q', 70, [], [9], 9, [5]);
-        list.des('y', 63, [], [2, 8], 8, [3]);
-        list.des('t', 35, [], [3], 3);
+        list.des('p', 70, [2], [2], 2, [5]);
+        list.des('q', 70, [9], [9], 9, [5]);
+        list.des('y', 63, [8], [2, 8], 8, [3]);
+        list.des('t', 35, [3], [3], 3);
         // lowercase
         list.lowercase('a', 56, [7], [], [3, 4]);
         list.lowercase('c', 56, [], [], [4, 5]);
@@ -261,11 +261,27 @@ if (selection.length > 0) {
             );
             continue;
         }
-        var alt = app.fonts.itemByName(font_fam + '	Ligature Lower');
-        var altshort = app.fonts.itemByName(font_fam + '	Ligature Upper');
-        var regular = app.fonts.itemByName(font_fam + '	Neutral');
 
         var textconsole = [''];
+        var leading = text.leading;
+        var leadingUnit =
+            leading === Leading.AUTO
+                ? (text.autoLeading * text.pointSize) / 100
+                : leading;
+
+        //var alt = app.fonts.itemByName(font_fam + '	Ligature Lower'); // --lig
+        //var altshort = app.fonts.itemByName(font_fam + '	Ligature Upper'); // --lig_cap
+        var regular = app.fonts.itemByName(font_fam + '	Neutral');
+        // --lig_des
+        // letter t calc(var(--lig) + var(--lig_extra));
+        // letter t calc(var(--lig_cap) + var(--lig_extra));
+        const lh = leadingUnit / (3.64 * text.pointSize);
+        const lig = clamp(getLig(lh));
+        const ligdes = clamp(getLigdes(lh));
+        const ligcap = clamp(getLigcap(lh));
+        const ligextra = 9;
+        const ligcapt = clamp(ligcap + ligextra);
+        const ligt = clamp(lig + ligextra);
 
         target.parentStory.tracking = 0;
         if (target.overflows == true) {
@@ -303,13 +319,14 @@ if (selection.length > 0) {
         if (checkexecute) {
             target.parentStory.appliedFont = regular;
             if (target.overflows == true) {
-                // target.fit(FitOptions.FRAME_TO_CONTENT);
+                // target.fit(FitOptions.FRAME_TO_CONTENT); should not be possible?
                 alert(
                     'text is too long :( please make sure that there is no text overset (by making fontsize smaller, widen or make the text frame taller)'
                 );
             } else {
                 calculateLigature();
-                text.leading = (44 / 12) * text.pointSize;
+                //text.leading = (44 / 12) * text.pointSize;
+                text.leading = leading;
             }
         }
 
@@ -402,18 +419,24 @@ if (selection.length > 0) {
                         // render_arr
                         var span = {
                             is: false,
-                            altshort: false,
+                            //altshort: false,
                             kernl: kern,
                             kernr: kernr,
+                            axis: 0,
                         };
                         if (check) {
                             span = {
                                 is: true,
-                                altshort: false,
+                                //altshort: false,
                                 kernl: kern,
                                 kernr: kernr,
+                                axis: lig,
                             };
+                            if (string == 't') {
+                                span.isT = true;
+                            }
                             if (charac.st_down) {
+                                span.axis = ligdes;
                                 down_arr_span.push({
                                     string: string,
                                     tempvl: tong + charac.vl_down - 1,
@@ -475,11 +498,17 @@ if (selection.length > 0) {
                         if (arrs[spans[a].tempvl] == undefined) {
                             continue;
                         } else if (arrs[spans[a].tempvl][0]) {
+                            /*
                             render_arr[spans[a].nested1][
                                 spans[a].nested2
                             ].altshort = arrs[spans[a].tempvl][1]
                                 ? true
-                                : false;
+                                : false;*/
+                            if (arrs[spans[a].tempvl][1]) {
+                                render_arr[spans[a].nested1][
+                                    spans[a].nested2
+                                ].axis = ligcap;
+                            }
                         } else {
                             render_arr[spans[a].nested1][
                                 spans[a].nested2
@@ -493,11 +522,17 @@ if (selection.length > 0) {
             for (var i = 0; i < render_arr.length; i++) {
                 for (var k = 0; k < render_arr[i].length; k++) {
                     if (render_arr[i][k].is) {
+                        /*
                         target.lines[i].characters[k].appliedFont = render_arr[
                             i
                         ][k].altshort
                             ? altshort
-                            : alt;
+                            : alt;*/
+                        var axis = render_arr[i][k].axis;
+                        if (render_arr[i][k].isT) {
+                            axis = axis == ligcap ? ligcapt : ligt;
+                        }
+                        target.lines[i].characters[k].setNthDesignAxis(0, axis);
 
                         if (render_arr[i][k].kernr != 0) {
                             target.lines[i].characters[k].tracking =
@@ -512,6 +547,60 @@ if (selection.length > 0) {
             }
         }
     }
+}
+
+function getLig(lh) {
+    const constrainedX = 8 + ((lh - 0.3) / 0.7) * (88 - 8);
+    return Math.min(88, Math.max(constrainedX, 8));
+}
+function getLigdes(lh) {
+    if (lh <= 0.3) {
+        return 0;
+    }
+    const v = [0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1];
+    const o = [1, 14, 27, 41, 55, 68, 82, 97];
+    const c = Math.max(v[0], Math.min(lh, v[v.length - 1]));
+    const i = findIndex(v, function (val) {
+        return val >= c;
+    });
+    return i === -1
+        ? o[o.length - 1]
+        : o[i - 1] + ((c - v[i - 1]) / (v[i] - v[i - 1])) * (o[i] - o[i - 1]);
+}
+function getLigcap(lh) {
+    if (lh <= 0.3) {
+        return 0;
+    }
+    const v = [0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1];
+    const o = [2, 13, 24, 35, 47, 57, 69, 80];
+    const c = Math.max(v[0], Math.min(lh, v[v.length - 1]));
+    const i = findIndex(v, function (val) {
+        return val >= c;
+    });
+    return i === -1
+        ? o[o.length - 1]
+        : o[i - 1] + ((c - v[i - 1]) / (v[i] - v[i - 1])) * (o[i] - o[i - 1]);
+}
+
+function clamp(value) {
+    return Math.max(0, Math.min(100, value));
+}
+
+function findIndex(array, callback, thisArg) {
+    if (array == null) {
+        throw new TypeError('findIndex called on null or undefined');
+    }
+    if (typeof callback !== 'function') {
+        throw new TypeError(callback + ' is not a function');
+    }
+    var length = array.length >>> 0; // Ensure length is a 32-bit unsigned integer
+
+    for (var i = 0; i < length; i++) {
+        if (i in array && callback.call(thisArg, array[i], i, array)) {
+            return i; // Return the index of the first matching element
+        }
+    }
+    return -1; // No matching element found
 }
 
 // Script Credits: written by Bao Anh Bui @bao.anh.bui on instagram
