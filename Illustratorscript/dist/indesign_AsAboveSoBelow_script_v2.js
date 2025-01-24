@@ -5,8 +5,9 @@ const vLigDes = [0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1];
 const oLigDes = [1, 14, 27, 41, 55, 68, 82, 97];
 const vLigCap = [0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1];
 const oLigCap = [2, 13, 24, 35, 47, 57, 69, 80];
+const selectionLength = selection.length;
 
-if (selection.length > 0) {
+if (selectionLength > 0) {
     var code = {};
     var list = new (function () {
         this._construct = function (
@@ -32,7 +33,7 @@ if (selection.length > 0) {
             ps_up_for_f = ps_up_for_f == undefined ? [] : ps_up_for_f;
             charcode = charcode == undefined ? varter.charCodeAt(0) : charcode;
             code[charcode] = this[varter] = {
-                width: width == null ? width : width / 7,
+                width: width / 7,
                 //width_: width / 7,
                 ps_up: ps_up, //(o duoi)
                 ps_down: ps_down, //(o tren)
@@ -244,15 +245,15 @@ if (selection.length > 0) {
         list.code(8212, '—', 84);
         list.lowercase('_', 63);
         // extra glyphs 24/01/2025
-        list.code(237, 'í', null);
-        list.code(243, 'ó', null);
-        list.code(8482, '™', null);
-        list.code(169, '©', null);
-        list.code(174, '®', null);
-        list.code(8230, '…', null);
+        list.code(237, 'í', 21);
+        list.code(243, 'ó', 63);
+        list.code(8482, '™', 154);
+        list.code(169, '©', 84);
+        list.code(174, '®', 84);
+        list.code(8230, '…', 28);
     }
 
-    for (var _ = 0; _ < selection.length; _++) {
+    for (var _ = 0; _ < selectionLength; _++) {
         var checkexecute = true;
         var target = selection[_];
 
@@ -307,14 +308,18 @@ if (selection.length > 0) {
         target.parentStory.tracking = 0;
         parentStory.leading = 0;
         parentStory.pointSize = pointSz;
-        target.lines[0].characters[0].setNthDesignAxis(0, 100);
+        var targetLines = target.lines.everyItem().getElements();
+        targetLines[0].characters[0].setNthDesignAxis(0, 100);
         if (target.overflows == true) {
             target.fit(FitOptions.FRAME_TO_CONTENT);
         }
-        target.lines[0].characters[0].setNthDesignAxis(0, 0);
-        for (var i = 0; i < target.lines.length; i++) {
-            for (var k = 0; k < target.lines[i].contents.length; k++) {
-                var charcode = target.lines[i].contents.charCodeAt(k);
+        targetLines[0].characters[0].setNthDesignAxis(0, 0);
+
+        var targetLineLength = targetLines.length;
+        for (var i = 0; i < targetLineLength; i++) {
+            var targetLineContentLength = targetLines[i].contents.length;
+            for (var k = 0; k < targetLineContentLength; k++) {
+                var charcode = targetLines[i].contents.charCodeAt(k);
                 var stringfromcode = String.fromCharCode(charcode);
                 if (
                     list[stringfromcode] == undefined &&
@@ -365,27 +370,32 @@ if (selection.length > 0) {
 
             function render_arr_create() {
                 //main area
-                for (var count = 0; count < target.lines.length; count++) {
+                var targetLineLength = targetLines.length;
+                for (var count = 0; count < targetLineLength; count++) {
                     var tong = 0;
-                    var targetline_chars = target.lines[count].characters;
+                    var targetline_chars = targetLines[count].characters
+                        .everyItem()
+                        .getElements();
                     textconsole[count] = '';
 
-                    for (var k = 0; k < targetline_chars.length; k++) {
+                    var targetline_charsLength = targetline_chars.length;
+                    for (var k = 0; k < targetline_charsLength; k++) {
                         var check = false;
                         var string = String.fromCharCode(
-                            target.lines[count].contents.charCodeAt(k)
+                            targetLines[count].contents.charCodeAt(k)
                         );
                         var stringnxt = String.fromCharCode(
-                            target.lines[count].contents.charCodeAt(k + 1)
+                            targetLines[count].contents.charCodeAt(k + 1)
                         );
                         textconsole[count] += string;
                         var charac = list[string];
                         charac =
                             charac == undefined
                                 ? code[
-                                      target.lines[count].contents.charCodeAt(k)
+                                      targetLines[count].contents.charCodeAt(k)
                                   ]
                                 : charac;
+                        /*
                         if (charac.width == null) {
                             charac.width = Math.round(
                                 (targetline_chars[k].insertionPoints[-1]
@@ -394,7 +404,7 @@ if (selection.length > 0) {
                                         .horizontalOffset) *
                                     (40.4999 / pointSz)
                             );
-                        }
+                        }*/
                         if (charac == undefined) {
                             return;
                         }
@@ -476,19 +486,22 @@ if (selection.length > 0) {
                         render_arr[count].push(span);
 
                         // up_arr
-                        for (var i = 1; i <= charac.width; i++) {
+                        var characWidth = charac.width;
+                        for (var i = 1; i <= characWidth; i++) {
                             up_arr.push({
                                 chek: false,
                                 for_f: false,
                             });
                         }
 
-                        for (var i = 0; i < charac.ps_up.length; i++) {
+                        var characps_uplength = charac.ps_up.length;
+                        for (var i = 0; i < characps_uplength; i++) {
                             up_arr[tong + charac.ps_up[i] - 1].chek = true;
                             up_arr[tong + charac.ps_up[i] - 1].for_f = false;
                         }
 
-                        for (var i = 0; i < charac.ps_up_for_f.length; i++) {
+                        var characps_up_for_flength = charac.ps_up_for_f.length;
+                        for (var i = 0; i < characps_up_for_flength; i++) {
                             up_arr[
                                 tong + charac.ps_up_for_f[i] - 1
                             ].chek = true;
@@ -497,10 +510,11 @@ if (selection.length > 0) {
                             ].for_f = true;
                         }
                         // down_arr
-                        for (var i = 1; i <= charac.width; i++) {
+                        for (var i = 1; i <= characWidth; i++) {
                             down_arr.push([false, charac.cap, string]);
                         }
-                        for (var i = 0; i < charac.ps_down.length; i++) {
+                        var characps_downlength = charac.ps_down.length;
+                        for (var i = 0; i < characps_downlength; i++) {
                             down_arr[tong + charac.ps_down[i] - 1] = [
                                 true,
                                 charac.cap,
@@ -508,7 +522,7 @@ if (selection.length > 0) {
                             ];
                         }
 
-                        tong += charac.width;
+                        tong += characWidth;
                     }
 
                     up_arr_tong.push((up_arr = []));
@@ -518,28 +532,31 @@ if (selection.length > 0) {
                 }
 
                 //descender
-                for (var i = 0; i < down_arr_span_tong.length - 1; i++) {
+                var down_arr_span_tonglength = down_arr_span_tong.length - 1;
+                for (var i = 0; i < down_arr_span_tonglength; i++) {
                     var spans = down_arr_span_tong[i];
                     var arrs = down_arr_tong[i + 1];
 
-                    for (var a = 0; a < spans.length; a++) {
-                        if (arrs[spans[a].tempvl] == undefined) {
+                    var spanLength = spans.length;
+                    for (var a = 0; a < spanLength; a++) {
+                        var spansa = spans[a];
+                        if (arrs[spansa.tempvl] == undefined) {
                             continue;
-                        } else if (arrs[spans[a].tempvl][0]) {
+                        } else if (arrs[spansa.tempvl][0]) {
                             /*
-                            render_arr[spans[a].nested1][
-                                spans[a].nested2
-                            ].altshort = arrs[spans[a].tempvl][1]
+                            render_arr[spansa.nested1][
+                                spansa.nested2
+                            ].altshort = arrs[spansa.tempvl][1]
                                 ? true
                                 : false;*/
-                            if (arrs[spans[a].tempvl][1]) {
-                                render_arr[spans[a].nested1][
-                                    spans[a].nested2
+                            if (arrs[spansa.tempvl][1]) {
+                                render_arr[spansa.nested1][
+                                    spansa.nested2
                                 ].axis = ligcap;
                             }
                         } else {
-                            render_arr[spans[a].nested1][
-                                spans[a].nested2
+                            render_arr[spansa.nested1][
+                                spansa.nested2
                             ].is = false;
                         }
                     }
@@ -547,28 +564,38 @@ if (selection.length > 0) {
             }
 
             // fully render
-            for (var i = 0; i < render_arr.length; i++) {
-                for (var k = 0; k < render_arr[i].length; k++) {
-                    if (render_arr[i][k].is) {
+            var render_arrlength = render_arr.length;
+            for (var i = 0; i < render_arrlength; i++) {
+                var render_arrilength = render_arr[i].length;
+                if (!targetLines[i]) {
+                    continue;
+                }
+                var targetLinescharacters = targetLines[i].characters
+                    .everyItem()
+                    .getElements();
+                var render_arri = render_arr[i];
+                for (var k = 0; k < render_arrilength; k++) {
+                    var render_arrik = render_arri[k];
+                    if (render_arrik.is) {
                         /*
-                        target.lines[i].characters[k].appliedFont = render_arr[
+                        targetLinescharacters[k].appliedFont = render_arr[
                             i
                         ][k].altshort
                             ? altshort
                             : alt;*/
-                        var axis = render_arr[i][k].axis;
-                        if (render_arr[i][k].isT) {
+                        var axis = render_arrik.axis;
+                        if (render_arrik.isT) {
                             axis = axis == ligcap ? ligcapt : ligt;
                         }
-                        target.lines[i].characters[k].setNthDesignAxis(0, axis);
+                        targetLinescharacters[k].designAxes = [axis];
 
-                        if (render_arr[i][k].kernr != 0) {
-                            target.lines[i].characters[k].tracking =
-                                render_arr[i][k].kernr * 70;
+                        if (render_arrik.kernr != 0) {
+                            targetLinescharacters[k].tracking =
+                                render_arrik.kernr * 70;
                         }
-                        if (k > 0 && render_arr[i][k].kernl != 0) {
-                            target.lines[i].characters[k - 1].tracking =
-                                render_arr[i][k].kernl * 70;
+                        if (k > 0 && render_arrik.kernl != 0) {
+                            targetLinescharacters[k - 1].tracking =
+                                render_arrik.kernl * 70;
                         }
                     }
                 }
@@ -604,7 +631,7 @@ function getLigAlt(lh, vLig, oLig) {
 }
 
 function clamp(value) {
-    return Math.max(0, Math.min(100, value));
+    return Math.round(Math.max(0, Math.min(100, value)));
 }
 
 function findIndex(array, callback, thisArg) {
