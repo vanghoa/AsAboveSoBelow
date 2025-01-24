@@ -32,7 +32,7 @@ if (selection.length > 0) {
             ps_up_for_f = ps_up_for_f == undefined ? [] : ps_up_for_f;
             charcode = charcode == undefined ? varter.charCodeAt(0) : charcode;
             code[charcode] = this[varter] = {
-                width: width / 7,
+                width: width == null ? width : width / 7,
                 //width_: width / 7,
                 ps_up: ps_up, //(o duoi)
                 ps_down: ps_down, //(o tren)
@@ -243,7 +243,13 @@ if (selection.length > 0) {
         list.code(8211, '–', 63);
         list.code(8212, '—', 84);
         list.lowercase('_', 63);
-        //
+        // extra glyphs 24/01/2025
+        list.lowercase('í', null);
+        list.lowercase('ó', null);
+        list.lowercase('™', null);
+        list.lowercase('©', null);
+        list.lowercase('®', null);
+        list.lowercase('…', null);
     }
 
     for (var _ = 0; _ < selection.length; _++) {
@@ -264,11 +270,12 @@ if (selection.length > 0) {
         }
 
         // Retrieve the font name
+        var parentStory = target.parentStory;
         var text = target.parentStory.texts[0];
         if (text.length == 0) {
             continue;
         }
-        var font_fam = text.appliedFont.fontFamily;
+        var font_fam = parentStory.appliedFont.fontFamily;
         if (font_fam.indexOf('As Above, So Below') == -1) {
             checkexecute = false;
             alert(
@@ -278,19 +285,19 @@ if (selection.length > 0) {
         }
 
         var textconsole = [''];
-        var leading = text.leading;
+        var leading = parentStory.leading;
         var leadingUnit =
             leading === Leading.AUTO
-                ? (text.autoLeading * text.pointSize) / 100
+                ? (parentStory.autoLeading * parentStory.pointSize) / 100
                 : leading;
-
+        var pointSz = parentStory.pointSize;
         //var alt = app.fonts.itemByName(font_fam + '	Ligature Lower'); // --lig
         //var altshort = app.fonts.itemByName(font_fam + '	Ligature Upper'); // --lig_cap
         var regular = app.fonts.itemByName(font_fam + '	Neutral');
         // --lig_des
         // letter t calc(var(--lig) + var(--lig_extra));
         // letter t calc(var(--lig_cap) + var(--lig_extra));
-        var lh = leadingUnit / (3.64 * text.pointSize);
+        var lh = leadingUnit / (3.64 * parentStory.pointSize);
         var lig = clamp(getLig(lh));
         var ligdes = clamp(getLigAlt(lh, vLigDes, oLigDes));
         var ligcap = clamp(getLigAlt(lh, vLigCap, oLigCap));
@@ -298,7 +305,8 @@ if (selection.length > 0) {
         var ligt = clamp(lig + 9);
 
         target.parentStory.tracking = 0;
-        text.leading = 0;
+        parentStory.leading = 0;
+        parentStory.pointSize = pointSz;
         target.lines[0].characters[0].setNthDesignAxis(0, 100);
         if (target.overflows == true) {
             target.fit(FitOptions.FRAME_TO_CONTENT);
@@ -336,7 +344,7 @@ if (selection.length > 0) {
             } else {
                 calculateLigature();
                 //text.leading = (44 / 12) * text.pointSize;
-                text.leading = leading;
+                parentStory.leading = leading;
                 execCount++;
             }
         }
@@ -378,6 +386,15 @@ if (selection.length > 0) {
                                       target.lines[count].contents.charCodeAt(k)
                                   ]
                                 : charac;
+                        if (charac.width == null) {
+                            charac.width = Math.round(
+                                (targetline_chars[k].insertionPoints[-1]
+                                    .horizontalOffset -
+                                    targetline_chars[k].insertionPoints[0]
+                                        .horizontalOffset) *
+                                    (40.4999 / pointSz)
+                            );
+                        }
                         if (charac == undefined) {
                             return;
                         }
