@@ -1,3 +1,4 @@
+app.scriptPreferences.enableRedraw = false;
 var myDoc = app.activeDocument;
 var selection = myDoc.selection;
 var execCount = 0;
@@ -412,18 +413,30 @@ if (selectionLength > 0) {
                         var kernr = 0;
                         // kern
                         if (tong != 0 && string != '\n' && string != '\r') {
-                            kern =
-                                +targetline_chars[k].insertionPoints[0]
-                                    .kerningValue / 70;
+                            try {
+                                kern =
+                                    +targetline_chars[
+                                        k
+                                    ].insertionPoints.firstItem().kerningValue /
+                                    70;
+                            } catch (e) {
+                                kern = 0;
+                            }
                         }
                         if (
                             k < targetline_chars.length - 1 &&
                             stringnxt != '\n' &&
                             stringnxt != '\r'
                         ) {
-                            kernr =
-                                +targetline_chars[k].insertionPoints[1]
-                                    .kerningValue / 70;
+                            try {
+                                kernr =
+                                    (+targetline_chars[
+                                        k
+                                    ].insertionPoints.lastItem().kerningValue ||
+                                        0) / 70;
+                            } catch (e) {
+                                kernr = 0;
+                            }
                         }
                         tong += kern;
                         // check
@@ -650,5 +663,5 @@ function findIndex(array, callback, thisArg) {
     }
     return -1; // No matching element found
 }
-
+app.scriptPreferences.enableRedraw = true;
 // Script Credits: written by Bao Anh Bui @bao.anh.bui on instagram
