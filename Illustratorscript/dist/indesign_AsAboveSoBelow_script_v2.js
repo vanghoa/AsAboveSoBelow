@@ -250,12 +250,17 @@ if (selection.length > 0) {
         var checkexecute = true;
         var target = selection[_];
 
-        if (target instanceof Text) {
-            target = target.parentTextFrames[0];
-        }
-
         if (!(target instanceof TextFrame)) {
-            continue;
+            if (
+                target &&
+                target.parentTextFrames &&
+                target.parentTextFrames[0]
+            ) {
+                target = target.parentTextFrames[0];
+            }
+            if (!(target instanceof TextFrame)) {
+                continue;
+            }
         }
 
         // Retrieve the font name
@@ -293,16 +298,12 @@ if (selection.length > 0) {
         var ligt = clamp(lig + 9);
 
         target.parentStory.tracking = 0;
+        text.leading = 0;
+        target.lines[0].characters[0].setNthDesignAxis(0, 100);
         if (target.overflows == true) {
             target.fit(FitOptions.FRAME_TO_CONTENT);
-            text.leading = 0;
-            /*
-            checkexecute = false;
-            alert(
-                'resize the frame so that there is no text overset & try again'
-            );
-            continue;*/
         }
+        target.lines[0].characters[0].setNthDesignAxis(0, 0);
         for (var i = 0; i < target.lines.length; i++) {
             for (var k = 0; k < target.lines[i].contents.length; k++) {
                 var charcode = target.lines[i].contents.charCodeAt(k);
