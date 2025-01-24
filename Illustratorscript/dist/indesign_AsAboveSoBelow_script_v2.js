@@ -244,12 +244,12 @@ if (selection.length > 0) {
         list.code(8212, '—', 84);
         list.lowercase('_', 63);
         // extra glyphs 24/01/2025
-        list.lowercase('í', null);
-        list.lowercase('ó', null);
-        list.lowercase('™', null);
-        list.lowercase('©', null);
-        list.lowercase('®', null);
-        list.lowercase('…', null);
+        list.code(237, 'í', null);
+        list.code(243, 'ó', null);
+        list.code(8482, '™', null);
+        list.code(169, '©', null);
+        list.code(174, '®', null);
+        list.code(8230, '…', null);
     }
 
     for (var _ = 0; _ < selection.length; _++) {
