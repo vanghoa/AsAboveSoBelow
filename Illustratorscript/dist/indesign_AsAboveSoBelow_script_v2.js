@@ -1,5 +1,10 @@
 var myDoc = app.activeDocument;
 var selection = myDoc.selection;
+var execCount = 0;
+const vLigDes = [0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1];
+const oLigDes = [1, 14, 27, 41, 55, 68, 82, 97];
+const vLigCap = [0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1];
+const oLigCap = [2, 13, 24, 35, 47, 57, 69, 80];
 
 if (selection.length > 0) {
     var code = {};
@@ -244,6 +249,11 @@ if (selection.length > 0) {
     for (var _ = 0; _ < selection.length; _++) {
         var checkexecute = true;
         var target = selection[_];
+
+        if (target instanceof Text) {
+            target = target.parentTextFrames[0];
+        }
+
         if (!(target instanceof TextFrame)) {
             continue;
         }
@@ -257,7 +267,7 @@ if (selection.length > 0) {
         if (font_fam.indexOf('As Above, So Below') == -1) {
             checkexecute = false;
             alert(
-                'Please select font that has "As Above, So Below" in its name!'
+                'There is a text frame that does not have "As Above, So Below" in its name. Please change.'
             );
             continue;
         }
@@ -275,13 +285,12 @@ if (selection.length > 0) {
         // --lig_des
         // letter t calc(var(--lig) + var(--lig_extra));
         // letter t calc(var(--lig_cap) + var(--lig_extra));
-        const lh = leadingUnit / (3.64 * text.pointSize);
-        const lig = clamp(getLig(lh));
-        const ligdes = clamp(getLigdes(lh));
-        const ligcap = clamp(getLigcap(lh));
-        const ligextra = 9;
-        const ligcapt = clamp(ligcap + ligextra);
-        const ligt = clamp(lig + ligextra);
+        var lh = leadingUnit / (3.64 * text.pointSize);
+        var lig = clamp(getLig(lh));
+        var ligdes = clamp(getLigAlt(lh, vLigDes, oLigDes));
+        var ligcap = clamp(getLigAlt(lh, vLigCap, oLigCap));
+        var ligcapt = clamp(ligcap + 9);
+        var ligt = clamp(lig + 9);
 
         target.parentStory.tracking = 0;
         if (target.overflows == true) {
@@ -327,6 +336,7 @@ if (selection.length > 0) {
                 calculateLigature();
                 //text.leading = (44 / 12) * text.pointSize;
                 text.leading = leading;
+                execCount++;
             }
         }
 
@@ -549,37 +559,30 @@ if (selection.length > 0) {
     }
 }
 
+if (execCount == 0) {
+    alert(
+        'No text frame was transformed, please make sure you:' +
+            '\n-select the text frame with the Selection Tool (V)' +
+            "\n-the text frame's applied font has 'As Above, So Below' in its name"
+    );
+}
+
 function getLig(lh) {
-    const constrainedX = 8 + ((lh - 0.3) / 0.7) * (88 - 8);
-    return Math.min(88, Math.max(constrainedX, 8));
+    return Math.min(88, Math.max(8 + ((lh - 0.3) / 0.7) * (88 - 8), 8));
 }
-function getLigdes(lh) {
+function getLigAlt(lh, vLig, oLig) {
     if (lh <= 0.3) {
         return 0;
     }
-    const v = [0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1];
-    const o = [1, 14, 27, 41, 55, 68, 82, 97];
-    const c = Math.max(v[0], Math.min(lh, v[v.length - 1]));
-    const i = findIndex(v, function (val) {
+    const c = Math.max(vLig[0], Math.min(lh, vLig[vLig.length - 1]));
+    const i = findIndex(vLig, function (val) {
         return val >= c;
     });
     return i === -1
-        ? o[o.length - 1]
-        : o[i - 1] + ((c - v[i - 1]) / (v[i] - v[i - 1])) * (o[i] - o[i - 1]);
-}
-function getLigcap(lh) {
-    if (lh <= 0.3) {
-        return 0;
-    }
-    const v = [0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1];
-    const o = [2, 13, 24, 35, 47, 57, 69, 80];
-    const c = Math.max(v[0], Math.min(lh, v[v.length - 1]));
-    const i = findIndex(v, function (val) {
-        return val >= c;
-    });
-    return i === -1
-        ? o[o.length - 1]
-        : o[i - 1] + ((c - v[i - 1]) / (v[i] - v[i - 1])) * (o[i] - o[i - 1]);
+        ? oLig[oLig.length - 1]
+        : oLig[i - 1] +
+              ((c - vLig[i - 1]) / (vLig[i] - vLig[i - 1])) *
+                  (oLig[i] - oLig[i - 1]);
 }
 
 function clamp(value) {
